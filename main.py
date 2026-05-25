@@ -1,10 +1,15 @@
 import csv
 from pathlib import Path
 
+from openpyxl import Workbook
+from openpyxl.styles import Font, PatternFill
+from openpyxl.utils import get_column_letter
+
 
 SAMPLE_DIR = Path("samples/ladder")
 OUTPUT_DIR = Path("output")
-OUTPUT_PATH = OUTPUT_DIR / "io_list.csv"
+OUTPUT_CSV_PATH = OUTPUT_DIR / "io_list.csv"
+OUTPUT_EXCEL_PATH = OUTPUT_DIR / "io_list_report.xlsx"
 
 STEP_INDEX = 0
 INSTRUCTION_INDEX = 2
@@ -135,12 +140,8 @@ def build_output_rows(io_type, devices):
     return rows
 
 
-def write_io_list_csv(output_path, inputs, outputs):
+def write_io_list_csv(output_path, rows):
     output_path.parent.mkdir(parents=True, exist_ok=True)
-
-    rows = []
-    rows.extend(build_output_rows("INPUT", inputs))
-    rows.extend(build_output_rows("OUTPUT", outputs))
 
     fieldnames = [
         "No",
@@ -158,19 +159,100 @@ def write_io_list_csv(output_path, inputs, outputs):
         writer.writeheader()
         writer.writerows(rows)
 
-    return rows
+
+def write_sheet(ws, rows):
+    headers = [
+        "No",
+        "Type",
+        "Device",
+        "AddressNo",
+        "UsedFiles",
+        "Instructions",
+        "LogicNotes",
+        "Steps",
+    ]
+
+    ws.append(headers)
+
+    header_fill = PatternFill("solid", fgColor="D9EAF7")
+    header_font = Font(bold=True)
+
+    for cell in ws[1]:
+        cell.fill = header_fill
+        cell.font = header_font
+
+    for row in rows:
+        ws.append([row[header] for header in headers])
+
+    ws.freeze_panes = "A2"
+    ws.auto_filter.ref = ws.dimensions
+
+    for column_cells in ws.columns:
+        max_length = 0
+        column_letter = get_column_letter(column_cells[0].column)
+
+        for cell in column_cells:
+            value = "" if cell.value is None else str(cell.value)
+            max_length = max(max_length, len(value))
+
+        ws.column_dimensions[column_letter].width = min(max_length + 2, 60)
 
 
-def print_summary(inputs, outputs, output_path):
+def write_summary_sheet(ws, input_rows, output_rows, source_count):
+    ws.append(["Item", "Value"])
+    ws.append(["Source CSV files", source_count])
+    ws.append(["Input devices", len(input_rows)])
+    ws.append(["Output devices", len(output_rows)])
+    ws.append(["Total devices", len(input_rows) + len(output_rows)])
+
+    header_fill = PatternFill("solid", fgColor="D9EAF7")
+    header_font = Font(bold=True)
+
+    for cell in ws[1]:
+        cell.fill = header_fill
+        cell.font = header_font
+
+    ws.column_dimensions["A"].width = 24
+    ws.column_dimensions["B"].width = 18
+
+
+def write_io_list_excel(output_path, input_rows, output_rows, source_count):
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+
+    wb = Workbook()
+
+    summary_ws = wb.active
+    summary_ws.title = "SUMMARY"
+    write_summary_sheet(summary_ws, input_rows, output_rows, source_count)
+
+    input_ws = wb.create_sheet("INPUT")
+    write_sheet(input_ws, input_rows)
+
+    output_ws = wb.create_sheet("OUTPUT")
+    write_sheet(output_ws, output_rows)
+
+    wb.save(output_path)
+
+
+def print_summary(inputs, outputs, csv_path, excel_path):
     print(f"Input devices : {len(inputs)}")
     print(f"Output devices: {len(outputs)}")
-    print(f"Output file   : {output_path}")
+    print(f"CSV file      : {csv_path}")
+    print(f"Excel file    : {excel_path}")
 
 
 def main():
     inputs, outputs, _ = read_ladder_csv_files(SAMPLE_DIR)
-    write_io_list_csv(OUTPUT_PATH, inputs, outputs)
-    print_summary(inputs, outputs, OUTPUT_PATH)
+
+    input_rows = build_output_rows("INPUT", inputs)
+    output_rows = build_output_rows("OUTPUT", outputs)
+    all_rows = input_rows + output_rows
+    source_count = len(list(SAMPLE_DIR.glob("*.csv")))
+
+    write_io_list_csv(OUTPUT_CSV_PATH, all_rows)
+    write_io_list_excel(OUTPUT_EXCEL_PATH, input_rows, output_rows, source_count)
+
+    print_summary(inputs, outputs, OUTPUT_CSV_PATH, OUTPUT_EXCEL_PATH)
 
 
 if __name__ == "__main__":
