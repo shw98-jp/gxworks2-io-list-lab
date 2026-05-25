@@ -1,0 +1,22 @@
+﻿No,Type,Device,AddressNo,UsedFiles,Instructions,LogicNotes,Steps
+1,INPUT,X50,80,01CmnPgm.csv,LD,Count enable command:ON,01CmnPgm.csv:129
+2,INPUT,X51,81,01CmnPgm.csv,LD,Count enable command:OFF,01CmnPgm.csv:145
+3,INPUT,X52,82,01CmnPgm.csv,LD,Stores current value in D2000,01CmnPgm.csv:161
+4,INPUT,X53,83,02PreSet.csv,LD,Preset command,02PreSet.csv:52
+5,INPUT,X54,84,06DisCnt.csv,LD,Selected cnt fnc start cmd:ON,06DisCnt.csv:55
+6,INPUT,X55,85,06DisCnt.csv,LD,Selected cnt fnc start cmd:OFF,06DisCnt.csv:74
+7,INPUT,X56,86,04Lcnt1.csv,LD,Selected counter fnc start cmd,04Lcnt1.csv:52
+8,INPUT,X57,87,"04Lcnt1.csv,08LcPre.csv",LD,"Stores latch cnt val 1 in D2002,Stores latch cnt value in D2002","04Lcnt1.csv:71,08LcPre.csv:61"
+9,INPUT,X58,88,05Lcnt2.csv,LD,Stores latch cnt val 2 in D2004,05Lcnt2.csv:52
+10,INPUT,X59,89,07SplCnt.csv,LD,Selected counter fnc start cmd,07SplCnt.csv:57
+11,INPUT,X5A,90,07SplCnt.csv,LD,Stores sampling cnt val in D2006,07SplCnt.csv:76
+12,INPUT,X5B,91,03MchOut.csv,LD,Coincidence output enable cmd,03MchOut.csv:58
+13,INPUT,X5C,92,03MchOut.csv,AND,"Coinc sgnl 1 reset cmd:OFF,Coinc sgnl 1 reset cmd:ON",03MchOut.csv:98
+14,INPUT,X5D,93,10ChkFrq.csv,LD,Stores measured freq in D2008,10ChkFrq.csv:57
+15,INPUT,X5E,94,11ChkRsp.csv,LD,Stores measured rot spd in D2010,11ChkRsp.csv:58
+16,INPUT,X5F,95,12ChkPls.csv,LD,Pulse measurement start command,12ChkPls.csv:55
+17,INPUT,X60,96,12ChkPls.csv,LD,Stores measured pulse in D2012,12ChkPls.csv:75
+18,INPUT,X61,97,13OutPwm.csv,LD,,13OutPwm.csv:86
+19,INPUT,X62,98,14RstErr.csv,LD,CH1 error reset command,14RstErr.csv:103
+1,OUTPUT,Y70,112,03MchOut.csv,OUT,Coincidence conf LED signal,03MchOut.csv:80
+2,OUTPUT,Y71,113,09ChkOvr.csv,OUT,Overflow confirmation LED signal,09ChkOvr.csv:59
