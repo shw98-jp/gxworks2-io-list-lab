@@ -16,6 +16,25 @@ INSTRUCTION_INDEX = 2
 DEVICE_INDEX = 3
 NOTE_INDEX = 6
 
+IO_FIELDNAMES = [
+    "No",
+    "Type",
+    "Device",
+    "AddressNo",
+    "UsedFiles",
+    "Instructions",
+    "LogicNotes",
+    "Steps",
+]
+
+ERROR_FIELDNAMES = [
+    "Level",
+    "Type",
+    "Device",
+    "Message",
+    "Details",
+]
+
 
 def device_sort_key(device):
     device_type = device[0]
@@ -140,39 +159,63 @@ def build_output_rows(io_type, devices):
     return rows
 
 
+def build_error_rows(inputs, outputs):
+    error_rows = []
+
+    all_devices = {}
+    all_devices.update(inputs)
+    all_devices.update(outputs)
+
+    for device in sorted(all_devices, key=device_sort_key):
+        item = all_devices[device]
+
+        if not item["logic_notes"]:
+            error_rows.append(
+                {
+                    "Level": "WARN",
+                    "Type": "MISSING_LOGIC_NOTE",
+                    "Device": device,
+                    "Message": "Logic note is empty.",
+                    "Details": ",".join(sorted(item["files"])),
+                }
+            )
+
+        if len(item["files"]) > 1:
+            error_rows.append(
+                {
+                    "Level": "WARN",
+                    "Type": "MULTIPLE_USED_FILES",
+                    "Device": device,
+                    "Message": "Device is used in multiple files.",
+                    "Details": ",".join(sorted(item["files"])),
+                }
+            )
+
+        if len(item["logic_notes"]) > 1:
+            error_rows.append(
+                {
+                    "Level": "WARN",
+                    "Type": "MULTIPLE_LOGIC_NOTES",
+                    "Device": device,
+                    "Message": "Device has multiple logic notes.",
+                    "Details": ",".join(sorted(item["logic_notes"])),
+                }
+            )
+
+    return error_rows
+
+
 def write_io_list_csv(output_path, rows):
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
-    fieldnames = [
-        "No",
-        "Type",
-        "Device",
-        "AddressNo",
-        "UsedFiles",
-        "Instructions",
-        "LogicNotes",
-        "Steps",
-    ]
-
     with output_path.open("w", encoding="utf-8-sig", newline="") as file:
-        writer = csv.DictWriter(file, fieldnames=fieldnames)
+        writer = csv.DictWriter(file, fieldnames=IO_FIELDNAMES)
         writer.writeheader()
         writer.writerows(rows)
 
 
-def write_sheet(ws, rows):
-    headers = [
-        "No",
-        "Type",
-        "Device",
-        "AddressNo",
-        "UsedFiles",
-        "Instructions",
-        "LogicNotes",
-        "Steps",
-    ]
-
-    ws.append(headers)
+def write_sheet(ws, rows, fieldnames):
+    ws.append(fieldnames)
 
     header_fill = PatternFill("solid", fgColor="D9EAF7")
     header_font = Font(bold=True)
@@ -182,7 +225,7 @@ def write_sheet(ws, rows):
         cell.font = header_font
 
     for row in rows:
-        ws.append([row[header] for header in headers])
+        ws.append([row[field] for field in fieldnames])
 
     ws.freeze_panes = "A2"
     ws.auto_filter.ref = ws.dimensions
@@ -195,15 +238,16 @@ def write_sheet(ws, rows):
             value = "" if cell.value is None else str(cell.value)
             max_length = max(max_length, len(value))
 
-        ws.column_dimensions[column_letter].width = min(max_length + 2, 60)
+        ws.column_dimensions[column_letter].width = min(max_length + 2, 80)
 
 
-def write_summary_sheet(ws, input_rows, output_rows, source_count):
+def write_summary_sheet(ws, input_rows, output_rows, error_rows, source_count):
     ws.append(["Item", "Value"])
     ws.append(["Source CSV files", source_count])
     ws.append(["Input devices", len(input_rows)])
     ws.append(["Output devices", len(output_rows)])
     ws.append(["Total devices", len(input_rows) + len(output_rows)])
+    ws.append(["Warnings", len(error_rows)])
 
     header_fill = PatternFill("solid", fgColor="D9EAF7")
     header_font = Font(bold=True)
@@ -216,27 +260,31 @@ def write_summary_sheet(ws, input_rows, output_rows, source_count):
     ws.column_dimensions["B"].width = 18
 
 
-def write_io_list_excel(output_path, input_rows, output_rows, source_count):
+def write_io_list_excel(output_path, input_rows, output_rows, error_rows, source_count):
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
     wb = Workbook()
 
     summary_ws = wb.active
     summary_ws.title = "SUMMARY"
-    write_summary_sheet(summary_ws, input_rows, output_rows, source_count)
+    write_summary_sheet(summary_ws, input_rows, output_rows, error_rows, source_count)
 
     input_ws = wb.create_sheet("INPUT")
-    write_sheet(input_ws, input_rows)
+    write_sheet(input_ws, input_rows, IO_FIELDNAMES)
 
     output_ws = wb.create_sheet("OUTPUT")
-    write_sheet(output_ws, output_rows)
+    write_sheet(output_ws, output_rows, IO_FIELDNAMES)
+
+    error_ws = wb.create_sheet("ERROR")
+    write_sheet(error_ws, error_rows, ERROR_FIELDNAMES)
 
     wb.save(output_path)
 
 
-def print_summary(inputs, outputs, csv_path, excel_path):
+def print_summary(inputs, outputs, errors, csv_path, excel_path):
     print(f"Input devices : {len(inputs)}")
     print(f"Output devices: {len(outputs)}")
+    print(f"Warnings      : {len(errors)}")
     print(f"CSV file      : {csv_path}")
     print(f"Excel file    : {excel_path}")
 
@@ -247,12 +295,19 @@ def main():
     input_rows = build_output_rows("INPUT", inputs)
     output_rows = build_output_rows("OUTPUT", outputs)
     all_rows = input_rows + output_rows
+    error_rows = build_error_rows(inputs, outputs)
     source_count = len(list(SAMPLE_DIR.glob("*.csv")))
 
     write_io_list_csv(OUTPUT_CSV_PATH, all_rows)
-    write_io_list_excel(OUTPUT_EXCEL_PATH, input_rows, output_rows, source_count)
+    write_io_list_excel(
+        OUTPUT_EXCEL_PATH,
+        input_rows,
+        output_rows,
+        error_rows,
+        source_count,
+    )
 
-    print_summary(inputs, outputs, OUTPUT_CSV_PATH, OUTPUT_EXCEL_PATH)
+    print_summary(inputs, outputs, error_rows, OUTPUT_CSV_PATH, OUTPUT_EXCEL_PATH)
 
 
 if __name__ == "__main__":
