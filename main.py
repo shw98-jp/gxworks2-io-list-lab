@@ -7,6 +7,7 @@ from openpyxl.utils import get_column_letter
 
 
 SAMPLE_DIR = Path("samples/ladder")
+COMMENT_CSV_PATH = Path("samples/device_comments/device_comments.csv")
 OUTPUT_DIR = Path("output")
 OUTPUT_CSV_PATH = OUTPUT_DIR / "io_list.csv"
 OUTPUT_EXCEL_PATH = OUTPUT_DIR / "io_list_report.xlsx"
@@ -20,6 +21,7 @@ IO_FIELDNAMES = [
     "No",
     "Type",
     "Device",
+    "DeviceComment",
     "AddressNo",
     "UsedFiles",
     "Instructions",
@@ -136,7 +138,33 @@ def read_ladder_csv_files(sample_dir):
     return inputs, outputs, raw_rows
 
 
-def build_output_rows(io_type, devices):
+def read_device_comments(comment_csv_path):
+    comments = {}
+
+    if not comment_csv_path.exists():
+        return comments
+
+    with comment_csv_path.open("r", encoding="utf-16", newline="") as file:
+        reader = csv.reader(file, delimiter="\t")
+
+        # First row is the project name. Second row is the header.
+        next(reader, None)
+        next(reader, None)
+
+        for row in reader:
+            if len(row) < 2:
+                continue
+
+            device = row[0].strip()
+            comment = row[1].strip()
+
+            if device and comment:
+                comments[device] = comment
+
+    return comments
+
+
+def build_output_rows(io_type, devices, device_comments):
     rows = []
 
     for index, device in enumerate(sorted(devices, key=device_sort_key), start=1):
@@ -148,6 +176,7 @@ def build_output_rows(io_type, devices):
                 "No": index,
                 "Type": io_type,
                 "Device": item["device"],
+                "DeviceComment": device_comments.get(device, ""),
                 "AddressNo": address_number,
                 "UsedFiles": ",".join(sorted(item["files"])),
                 "Instructions": ",".join(sorted(item["instructions"])),
@@ -159,7 +188,7 @@ def build_output_rows(io_type, devices):
     return rows
 
 
-def build_check_rows(inputs, outputs):
+def build_check_rows(inputs, outputs, device_comments):
     check_rows = []
 
     all_devices = {}
@@ -168,6 +197,17 @@ def build_check_rows(inputs, outputs):
 
     for device in sorted(all_devices, key=device_sort_key):
         item = all_devices[device]
+
+        if device not in device_comments:
+            check_rows.append(
+                {
+                    "Level": "WARN",
+                    "Type": "MISSING_DEVICE_COMMENT",
+                    "Device": device,
+                    "Message": "Device comment is empty.",
+                    "Details": ",".join(sorted(item["files"])),
+                }
+            )
 
         if not item["logic_notes"]:
             check_rows.append(
@@ -241,9 +281,17 @@ def write_sheet(ws, rows, fieldnames):
         ws.column_dimensions[column_letter].width = min(max_length + 2, 80)
 
 
-def write_summary_sheet(ws, input_rows, output_rows, check_rows, source_count):
+def write_summary_sheet(
+    ws,
+    input_rows,
+    output_rows,
+    check_rows,
+    ladder_source_count,
+    comment_count,
+):
     ws.append(["Item", "Value"])
-    ws.append(["Source CSV files", source_count])
+    ws.append(["Ladder CSV files", ladder_source_count])
+    ws.append(["Device comments", comment_count])
     ws.append(["Input devices", len(input_rows)])
     ws.append(["Output devices", len(output_rows)])
     ws.append(["Total devices", len(input_rows) + len(output_rows)])
@@ -260,14 +308,28 @@ def write_summary_sheet(ws, input_rows, output_rows, check_rows, source_count):
     ws.column_dimensions["B"].width = 18
 
 
-def write_io_list_excel(output_path, input_rows, output_rows, check_rows, source_count):
+def write_io_list_excel(
+    output_path,
+    input_rows,
+    output_rows,
+    check_rows,
+    ladder_source_count,
+    comment_count,
+):
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
     wb = Workbook()
 
     summary_ws = wb.active
     summary_ws.title = "SUMMARY"
-    write_summary_sheet(summary_ws, input_rows, output_rows, check_rows, source_count)
+    write_summary_sheet(
+        summary_ws,
+        input_rows,
+        output_rows,
+        check_rows,
+        ladder_source_count,
+        comment_count,
+    )
 
     input_ws = wb.create_sheet("INPUT")
     write_sheet(input_ws, input_rows, IO_FIELDNAMES)
@@ -281,22 +343,24 @@ def write_io_list_excel(output_path, input_rows, output_rows, check_rows, source
     wb.save(output_path)
 
 
-def print_summary(inputs, outputs, checks, csv_path, excel_path):
-    print(f"Input devices : {len(inputs)}")
-    print(f"Output devices: {len(outputs)}")
-    print(f"Check items   : {len(checks)}")
-    print(f"CSV file      : {csv_path}")
-    print(f"Excel file    : {excel_path}")
+def print_summary(inputs, outputs, checks, device_comments, csv_path, excel_path):
+    print(f"Input devices  : {len(inputs)}")
+    print(f"Output devices : {len(outputs)}")
+    print(f"Device comments: {len(device_comments)}")
+    print(f"Check items    : {len(checks)}")
+    print(f"CSV file       : {csv_path}")
+    print(f"Excel file     : {excel_path}")
 
 
 def main():
     inputs, outputs, _ = read_ladder_csv_files(SAMPLE_DIR)
+    device_comments = read_device_comments(COMMENT_CSV_PATH)
 
-    input_rows = build_output_rows("INPUT", inputs)
-    output_rows = build_output_rows("OUTPUT", outputs)
+    input_rows = build_output_rows("INPUT", inputs, device_comments)
+    output_rows = build_output_rows("OUTPUT", outputs, device_comments)
     all_rows = input_rows + output_rows
-    check_rows = build_check_rows(inputs, outputs)
-    source_count = len(list(SAMPLE_DIR.glob("*.csv")))
+    check_rows = build_check_rows(inputs, outputs, device_comments)
+    ladder_source_count = len(list(SAMPLE_DIR.glob("*.csv")))
 
     write_io_list_csv(OUTPUT_CSV_PATH, all_rows)
     write_io_list_excel(
@@ -304,10 +368,18 @@ def main():
         input_rows,
         output_rows,
         check_rows,
-        source_count,
+        ladder_source_count,
+        len(device_comments),
     )
 
-    print_summary(inputs, outputs, check_rows, OUTPUT_CSV_PATH, OUTPUT_EXCEL_PATH)
+    print_summary(
+        inputs,
+        outputs,
+        check_rows,
+        device_comments,
+        OUTPUT_CSV_PATH,
+        OUTPUT_EXCEL_PATH,
+    )
 
 
 if __name__ == "__main__":
