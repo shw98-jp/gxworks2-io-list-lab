@@ -1,4 +1,4 @@
-import csv
+﻿import csv
 from pathlib import Path
 
 from openpyxl import Workbook
@@ -27,7 +27,7 @@ IO_FIELDNAMES = [
     "Steps",
 ]
 
-ERROR_FIELDNAMES = [
+CHECK_FIELDNAMES = [
     "Level",
     "Type",
     "Device",
@@ -159,8 +159,8 @@ def build_output_rows(io_type, devices):
     return rows
 
 
-def build_error_rows(inputs, outputs):
-    error_rows = []
+def build_check_rows(inputs, outputs):
+    check_rows = []
 
     all_devices = {}
     all_devices.update(inputs)
@@ -170,7 +170,7 @@ def build_error_rows(inputs, outputs):
         item = all_devices[device]
 
         if not item["logic_notes"]:
-            error_rows.append(
+            check_rows.append(
                 {
                     "Level": "WARN",
                     "Type": "MISSING_LOGIC_NOTE",
@@ -181,7 +181,7 @@ def build_error_rows(inputs, outputs):
             )
 
         if len(item["files"]) > 1:
-            error_rows.append(
+            check_rows.append(
                 {
                     "Level": "WARN",
                     "Type": "MULTIPLE_USED_FILES",
@@ -192,7 +192,7 @@ def build_error_rows(inputs, outputs):
             )
 
         if len(item["logic_notes"]) > 1:
-            error_rows.append(
+            check_rows.append(
                 {
                     "Level": "WARN",
                     "Type": "MULTIPLE_LOGIC_NOTES",
@@ -202,7 +202,7 @@ def build_error_rows(inputs, outputs):
                 }
             )
 
-    return error_rows
+    return check_rows
 
 
 def write_io_list_csv(output_path, rows):
@@ -241,13 +241,13 @@ def write_sheet(ws, rows, fieldnames):
         ws.column_dimensions[column_letter].width = min(max_length + 2, 80)
 
 
-def write_summary_sheet(ws, input_rows, output_rows, error_rows, source_count):
+def write_summary_sheet(ws, input_rows, output_rows, check_rows, source_count):
     ws.append(["Item", "Value"])
     ws.append(["Source CSV files", source_count])
     ws.append(["Input devices", len(input_rows)])
     ws.append(["Output devices", len(output_rows)])
     ws.append(["Total devices", len(input_rows) + len(output_rows)])
-    ws.append(["Warnings", len(error_rows)])
+    ws.append(["Check items", len(check_rows)])
 
     header_fill = PatternFill("solid", fgColor="D9EAF7")
     header_font = Font(bold=True)
@@ -260,14 +260,14 @@ def write_summary_sheet(ws, input_rows, output_rows, error_rows, source_count):
     ws.column_dimensions["B"].width = 18
 
 
-def write_io_list_excel(output_path, input_rows, output_rows, error_rows, source_count):
+def write_io_list_excel(output_path, input_rows, output_rows, check_rows, source_count):
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
     wb = Workbook()
 
     summary_ws = wb.active
     summary_ws.title = "SUMMARY"
-    write_summary_sheet(summary_ws, input_rows, output_rows, error_rows, source_count)
+    write_summary_sheet(summary_ws, input_rows, output_rows, check_rows, source_count)
 
     input_ws = wb.create_sheet("INPUT")
     write_sheet(input_ws, input_rows, IO_FIELDNAMES)
@@ -275,16 +275,16 @@ def write_io_list_excel(output_path, input_rows, output_rows, error_rows, source
     output_ws = wb.create_sheet("OUTPUT")
     write_sheet(output_ws, output_rows, IO_FIELDNAMES)
 
-    error_ws = wb.create_sheet("ERROR")
-    write_sheet(error_ws, error_rows, ERROR_FIELDNAMES)
+    check_ws = wb.create_sheet("CHECK")
+    write_sheet(check_ws, check_rows, CHECK_FIELDNAMES)
 
     wb.save(output_path)
 
 
-def print_summary(inputs, outputs, errors, csv_path, excel_path):
+def print_summary(inputs, outputs, checks, csv_path, excel_path):
     print(f"Input devices : {len(inputs)}")
     print(f"Output devices: {len(outputs)}")
-    print(f"Warnings      : {len(errors)}")
+    print(f"Check items   : {len(checks)}")
     print(f"CSV file      : {csv_path}")
     print(f"Excel file    : {excel_path}")
 
@@ -295,7 +295,7 @@ def main():
     input_rows = build_output_rows("INPUT", inputs)
     output_rows = build_output_rows("OUTPUT", outputs)
     all_rows = input_rows + output_rows
-    error_rows = build_error_rows(inputs, outputs)
+    check_rows = build_check_rows(inputs, outputs)
     source_count = len(list(SAMPLE_DIR.glob("*.csv")))
 
     write_io_list_csv(OUTPUT_CSV_PATH, all_rows)
@@ -303,11 +303,11 @@ def main():
         OUTPUT_EXCEL_PATH,
         input_rows,
         output_rows,
-        error_rows,
+        check_rows,
         source_count,
     )
 
-    print_summary(inputs, outputs, error_rows, OUTPUT_CSV_PATH, OUTPUT_EXCEL_PATH)
+    print_summary(inputs, outputs, check_rows, OUTPUT_CSV_PATH, OUTPUT_EXCEL_PATH)
 
 
 if __name__ == "__main__":
