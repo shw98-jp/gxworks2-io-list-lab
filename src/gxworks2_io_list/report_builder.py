@@ -31,6 +31,7 @@ def build_check_rows(inputs, outputs, device_comments):
     all_devices = {}
     all_devices.update(inputs)
     all_devices.update(outputs)
+    used_devices = set(all_devices)
 
     for device in sorted(all_devices, key=device_sort_key):
         item = all_devices[device]
@@ -78,5 +79,23 @@ def build_check_rows(inputs, outputs, device_comments):
                     "Details": ",".join(sorted(item["logic_notes"])),
                 }
             )
+
+    commented_io_devices = {
+        device
+        for device in device_comments
+        if device.startswith(("X", "Y"))
+    }
+    unused_commented_devices = commented_io_devices - used_devices
+
+    for device in sorted(unused_commented_devices, key=device_sort_key):
+        check_rows.append(
+            {
+                "Level": "INFO",
+                "Type": "COMMENTED_BUT_NOT_USED",
+                "Device": device,
+                "Message": "Device comment exists, but this device is not used in ladder CSV.",
+                "Details": device_comments[device],
+            }
+        )
 
     return check_rows
