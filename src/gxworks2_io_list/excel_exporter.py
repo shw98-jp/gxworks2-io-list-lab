@@ -2,7 +2,7 @@
 from openpyxl.styles import Font, PatternFill
 from openpyxl.utils import get_column_letter
 
-from .constants import CHECK_FIELDNAMES, IO_FIELDNAMES
+from .constants import CHECK_FIELDNAMES, IO_FIELDNAMES, RAW_FIELDNAMES
 
 
 def write_sheet(ws, rows, fieldnames):
@@ -64,6 +64,7 @@ def write_io_list_excel(
     input_rows,
     output_rows,
     check_rows,
+    raw_rows,
     ladder_source_count,
     comment_count,
 ):
@@ -90,5 +91,8 @@ def write_io_list_excel(
 
     check_ws = wb.create_sheet("CHECK")
     write_sheet(check_ws, check_rows, CHECK_FIELDNAMES)
+
+    raw_ws = wb.create_sheet("RAW_DATA")
+    write_sheet(raw_ws, raw_rows, RAW_FIELDNAMES)
 
     wb.save(output_path)

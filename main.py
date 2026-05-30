@@ -13,7 +13,7 @@ from src.gxworks2_io_list.summary import print_summary
 
 
 def main():
-    inputs, outputs, _ = read_ladder_csv_files(SAMPLE_DIR)
+    inputs, outputs, raw_rows = read_ladder_csv_files(SAMPLE_DIR)
     device_comments = read_device_comments(COMMENT_CSV_PATH)
 
     input_rows = build_output_rows("INPUT", inputs, device_comments)
@@ -28,6 +28,7 @@ def main():
         input_rows,
         output_rows,
         check_rows,
+        raw_rows,
         ladder_source_count,
         len(device_comments),
     )

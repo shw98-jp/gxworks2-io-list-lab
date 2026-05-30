@@ -31,3 +31,12 @@ CHECK_FIELDNAMES = [
     "Message",
     "Details",
 ]
+
+RAW_FIELDNAMES = [
+    "SourceFile",
+    "RowNumber",
+    "Step",
+    "Instruction",
+    "Device",
+    "LogicNote",
+]

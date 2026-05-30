@@ -18,8 +18,5 @@
 17,INPUT,X60,CH1 measured pulse read signal,96,12ChkPls.csv,LD,Stores measured pulse in D2012,12ChkPls.csv:75
 18,INPUT,X61,CH1 PWM output command signal,97,13OutPwm.csv,LD,,13OutPwm.csv:86
 19,INPUT,X62,CH1 error reset command signal,98,14RstErr.csv,LD,CH1 error reset command,14RstErr.csv:103
-20,INPUT,X97,,151,99TestWarnging.csv,LD,Stores current value in D2000,99TestWarnging.csv:161
-21,INPUT,X98,,152,99TestWarnging.csv,LD,Count enable command:OFF,99TestWarnging.csv:145
-22,INPUT,X99,,153,99TestWarnging.csv,LD,Count enable command:ON,99TestWarnging.csv:129
 1,OUTPUT,Y70,CH1 coinc confirmation LED sig,112,03MchOut.csv,OUT,Coincidence conf LED signal,03MchOut.csv:80
 2,OUTPUT,Y71,CH1 ovrflw occurrence LED signal,113,09ChkOvr.csv,OUT,Overflow confirmation LED signal,09ChkOvr.csv:59

@@ -70,12 +70,12 @@ def read_ladder_csv_files(sample_dir):
 
                 raw_rows.append(
                     {
-                        "source_file": sample_path.name,
-                        "row_number": row_number,
-                        "step": step,
-                        "instruction": instruction,
-                        "device": device,
-                        "logic_note": note,
+                        "SourceFile": sample_path.name,
+                        "RowNumber": row_number,
+                        "Step": step,
+                        "Instruction": instruction,
+                        "Device": device,
+                        "LogicNote": note,
                     }
                 )
 
