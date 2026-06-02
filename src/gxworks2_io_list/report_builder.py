@@ -40,9 +40,10 @@ def build_check_rows(inputs, outputs, device_comments):
             check_rows.append(
                 {
                     "Level": "WARN",
+                    "Category": "Documentation",
                     "Type": "MISSING_DEVICE_COMMENT",
                     "Device": device,
-                    "Message": "Device comment is empty.",
+                    "Message": "This I/O device is used in ladder CSV, but no device comment is registered.",
                     "Details": ",".join(sorted(item["files"])),
                 }
             )
@@ -50,10 +51,11 @@ def build_check_rows(inputs, outputs, device_comments):
         if not item["logic_notes"]:
             check_rows.append(
                 {
-                    "Level": "WARN",
+                    "Level": "INFO",
+                    "Category": "LogicContext",
                     "Type": "MISSING_LOGIC_NOTE",
                     "Device": device,
-                    "Message": "Logic note is empty.",
+                    "Message": "No nearby ladder logic note was found for this device.",
                     "Details": ",".join(sorted(item["files"])),
                 }
             )
@@ -62,9 +64,10 @@ def build_check_rows(inputs, outputs, device_comments):
             check_rows.append(
                 {
                     "Level": "WARN",
+                    "Category": "Usage",
                     "Type": "MULTIPLE_USED_FILES",
                     "Device": device,
-                    "Message": "Device is used in multiple files.",
+                    "Message": "This I/O device is referenced in multiple ladder CSV files. Check whether the shared usage is intentional.",
                     "Details": ",".join(sorted(item["files"])),
                 }
             )
@@ -73,9 +76,10 @@ def build_check_rows(inputs, outputs, device_comments):
             check_rows.append(
                 {
                     "Level": "WARN",
+                    "Category": "LogicContext",
                     "Type": "MULTIPLE_LOGIC_NOTES",
                     "Device": device,
-                    "Message": "Device has multiple logic notes.",
+                    "Message": "Multiple logic notes were linked to this device. Review the context before using them as signal descriptions.",
                     "Details": ",".join(sorted(item["logic_notes"])),
                 }
             )
@@ -91,9 +95,10 @@ def build_check_rows(inputs, outputs, device_comments):
         check_rows.append(
             {
                 "Level": "INFO",
+                "Category": "Documentation",
                 "Type": "COMMENTED_BUT_NOT_USED",
                 "Device": device,
-                "Message": "Device comment exists, but this device is not used in ladder CSV.",
+                "Message": "A device comment is registered, but this X/Y device was not found in ladder CSV.",
                 "Details": device_comments[device],
             }
         )

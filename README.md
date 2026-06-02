@@ -65,6 +65,24 @@ MULTIPLE_LOGIC_NOTES
 COMMENTED_BUT_NOT_USED
 ```
 
+CHECKシートでは、確認項目を以下のカテゴリに分類します。
+
+```text
+Documentation
+Usage
+LogicContext
+```
+
+各項目の意味は以下の通りです。
+
+| Type | Category | 意味 |
+|---|---|---|
+| MISSING_DEVICE_COMMENT | Documentation | ラダーでは使用されているが、Device Commentが登録されていない |
+| MISSING_LOGIC_NOTE | LogicContext | ラダー内で近くのノート情報が見つからない |
+| MULTIPLE_USED_FILES | Usage | 同じX/Yデバイスが複数のラダーCSVで参照されている |
+| MULTIPLE_LOGIC_NOTES | LogicContext | 同じX/Yデバイスに複数のLogicNotesが関連付けられている |
+| COMMENTED_BUT_NOT_USED | Documentation | Device Commentは登録されているが、ラダーCSVでは使用されていない |
+
 ## DeviceCommentとLogicNotesの違い
 
 `DeviceComment`は、PLCデバイスアドレス自体に付けられた説明です。

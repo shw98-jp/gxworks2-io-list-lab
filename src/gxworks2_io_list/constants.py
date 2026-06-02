@@ -26,6 +26,7 @@ IO_FIELDNAMES = [
 
 CHECK_FIELDNAMES = [
     "Level",
+    "Category",
     "Type",
     "Device",
     "Message",
