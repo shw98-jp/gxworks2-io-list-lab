@@ -1,4 +1,23 @@
-﻿from .device_utils import device_sort_key
+from .device_utils import device_sort_key
+
+
+SPARE_COMMENT_KEYWORDS = [
+    "spare",
+    "unused",
+    "reserve",
+    "reserved",
+    "予備",
+    "未使用",
+]
+
+
+def is_spare_or_unused_comment(comment):
+    normalized_comment = comment.strip().lower()
+
+    return any(
+        keyword.lower() in normalized_comment
+        for keyword in SPARE_COMMENT_KEYWORDS
+    )
 
 
 def build_output_rows(io_type, devices, device_comments):
@@ -92,14 +111,29 @@ def build_check_rows(inputs, outputs, device_comments):
     unused_commented_devices = commented_io_devices - used_devices
 
     for device in sorted(unused_commented_devices, key=device_sort_key):
+        device_comment = device_comments[device]
+
+        if is_spare_or_unused_comment(device_comment):
+            check_rows.append(
+                {
+                    "Level": "INFO",
+                    "Category": "Documentation",
+                    "Type": "SPARE_OR_UNUSED_DEVICE",
+                    "Device": device,
+                    "Message": "This X/Y device is documented as spare or unused and was not found in ladder CSV.",
+                    "Details": device_comment,
+                }
+            )
+            continue
+
         check_rows.append(
             {
-                "Level": "INFO",
+                "Level": "WARN",
                 "Category": "Documentation",
                 "Type": "COMMENTED_BUT_NOT_USED",
                 "Device": device,
-                "Message": "A device comment is registered, but this X/Y device was not found in ladder CSV.",
-                "Details": device_comments[device],
+                "Message": "A device comment is registered, but this X/Y device was not found in ladder CSV. Check whether it is obsolete, spare, or missing from the analyzed ladder files.",
+                "Details": device_comment,
             }
         )
 

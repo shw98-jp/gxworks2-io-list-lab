@@ -63,6 +63,7 @@ MISSING_LOGIC_NOTE
 MULTIPLE_USED_FILES
 MULTIPLE_LOGIC_NOTES
 COMMENTED_BUT_NOT_USED
+SPARE_OR_UNUSED_DEVICE
 ```
 
 CHECKシートでは、確認項目を以下のカテゴリに分類します。
@@ -82,6 +83,7 @@ LogicContext
 | MULTIPLE_USED_FILES | Usage | 同じX/Yデバイスが複数のラダーCSVで参照されている |
 | MULTIPLE_LOGIC_NOTES | LogicContext | 同じX/Yデバイスに複数のLogicNotesが関連付けられている |
 | COMMENTED_BUT_NOT_USED | Documentation | Device Commentは登録されているが、ラダーCSVでは使用されていない |
+| SPARE_OR_UNUSED_DEVICE | Documentation | 予備・未使用として登録されており、ラダーCSVでは使用されていない |
 
 ## DeviceCommentとLogicNotesの違い
 
