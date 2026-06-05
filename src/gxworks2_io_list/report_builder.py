@@ -6,8 +6,6 @@ SPARE_COMMENT_KEYWORDS = [
     "unused",
     "reserve",
     "reserved",
-    "予備",
-    "未使用",
 ]
 
 
@@ -15,7 +13,7 @@ def is_spare_or_unused_comment(comment):
     normalized_comment = comment.strip().lower()
 
     return any(
-        keyword.lower() in normalized_comment
+        keyword in normalized_comment
         for keyword in SPARE_COMMENT_KEYWORDS
     )
 
@@ -38,6 +36,27 @@ def build_output_rows(io_type, devices, device_comments):
                 "Instructions": ",".join(sorted(item["instructions"])),
                 "LogicNotes": ",".join(sorted(item["logic_notes"])),
                 "Steps": ",".join(sorted(item["steps"])),
+            }
+        )
+
+    return rows
+
+
+def build_device_usage_rows(device_usage):
+    rows = []
+
+    for index, device in enumerate(sorted(device_usage, key=device_sort_key), start=1):
+        item = device_usage[device]
+
+        rows.append(
+            {
+                "No": index,
+                "DeviceType": item["device_type"],
+                "Device": item["device"],
+                "Occurrences": item["occurrences"],
+                "UsedFiles": ",".join(sorted(item["files"])),
+                "Instructions": ",".join(sorted(item["instructions"])),
+                "Locations": ",".join(sorted(item["locations"])),
             }
         )
 

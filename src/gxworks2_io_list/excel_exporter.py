@@ -2,7 +2,12 @@
 from openpyxl.styles import Font, PatternFill
 from openpyxl.utils import get_column_letter
 
-from .constants import CHECK_FIELDNAMES, IO_FIELDNAMES, RAW_FIELDNAMES
+from .constants import (
+    CHECK_FIELDNAMES,
+    DEVICE_USAGE_FIELDNAMES,
+    IO_FIELDNAMES,
+    RAW_FIELDNAMES,
+)
 
 
 CHECK_LEVEL_ORDER = {
@@ -96,6 +101,7 @@ def write_summary_sheet(
     input_rows,
     output_rows,
     check_rows,
+    device_usage_rows,
     ladder_source_count,
     comment_count,
 ):
@@ -107,6 +113,7 @@ def write_summary_sheet(
     ws.append(["Input devices", len(input_rows)])
     ws.append(["Output devices", len(output_rows)])
     ws.append(["Total devices", len(input_rows) + len(output_rows)])
+    ws.append(["Device usage rows", len(device_usage_rows)])
     ws.append(["Check items", len(check_rows)])
     ws.append(["Check ERROR", check_level_counts["ERROR"]])
     ws.append(["Check WARN", check_level_counts["WARN"]])
@@ -128,6 +135,7 @@ def write_io_list_excel(
     input_rows,
     output_rows,
     check_rows,
+    device_usage_rows,
     raw_rows,
     ladder_source_count,
     comment_count,
@@ -143,6 +151,7 @@ def write_io_list_excel(
         input_rows,
         output_rows,
         check_rows,
+        device_usage_rows,
         ladder_source_count,
         comment_count,
     )
@@ -155,6 +164,9 @@ def write_io_list_excel(
 
     check_ws = wb.create_sheet("CHECK")
     write_check_sheet(check_ws, check_rows)
+
+    device_usage_ws = wb.create_sheet("DEVICE_USAGE")
+    write_sheet(device_usage_ws, device_usage_rows, DEVICE_USAGE_FIELDNAMES)
 
     raw_ws = wb.create_sheet("RAW_DATA")
     write_sheet(raw_ws, raw_rows, RAW_FIELDNAMES)

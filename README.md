@@ -31,6 +31,7 @@
 - グローバルデバイスコメントCSVを読み込み
 - DeviceComment列としてI/O一覧に結合
 - CHECKシートで確認項目を出力
+- DEVICE_USAGEシートでX/Y以外のデバイス・定数の使用状況を出力
 - RAW_DATAシートで解析元データを追跡可能にする
 - CSVとExcelの両方でレポートを出力
 
@@ -48,6 +49,7 @@ SUMMARY
 INPUT
 OUTPUT
 CHECK
+DEVICE_USAGE
 RAW_DATA
 ```
 
@@ -95,6 +97,35 @@ LogicContext
 | MULTIPLE_LOGIC_NOTES | このアドレスに複数の説明が付いており、意味を誤解しないか |
 | COMMENTED_BUT_NOT_USED | コメントはあるが、実際には使われていないアドレスではないか |
 | SPARE_OR_UNUSED_DEVICE | 予備・未使用として管理されているアドレスではないか |
+
+## DEVICE_USAGEシート
+
+`DEVICE_USAGE`シートは、I/Oリストには含めない内部デバイスや定数の使用状況を確認するための補助シートです。
+
+対象例:
+
+```text
+SM
+SD
+D
+K
+M
+T
+C
+```
+
+I/Oリストの主対象はX/Yですが、PLCプログラムの理解や保守では、内部リレー、特殊レジスタ、データレジスタ、定数がどこで使われているかを確認する場面があります。
+
+このシートでは、各デバイスについて以下を出力します。
+
+```text
+DeviceType
+Device
+Occurrences
+UsedFiles
+Instructions
+Locations
+```
 
 ## DeviceCommentとLogicNotesの違い
 

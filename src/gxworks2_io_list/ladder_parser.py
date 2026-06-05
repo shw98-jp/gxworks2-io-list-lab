@@ -1,6 +1,41 @@
-﻿import csv
+import csv
+import re
 
 from .constants import DEVICE_INDEX, INSTRUCTION_INDEX, NOTE_INDEX, STEP_INDEX
+
+
+def get_device_type(device):
+    match = re.match(r"^([A-Z]+)", device.upper())
+
+    if match is None:
+        return "UNKNOWN"
+
+    return match.group(1)
+
+
+def add_device_usage(target, device, instruction, file_name, row_number, step):
+    if device not in target:
+        target[device] = {
+            "device": device,
+            "device_type": get_device_type(device),
+            "files": set(),
+            "instructions": set(),
+            "locations": set(),
+            "occurrences": 0,
+        }
+
+    target[device]["occurrences"] += 1
+    target[device]["files"].add(file_name)
+
+    if instruction:
+        target[device]["instructions"].add(instruction)
+
+    location = f"{file_name}:row{row_number}"
+
+    if step:
+        location = f"{location}:step{step}"
+
+    target[device]["locations"].add(location)
 
 
 def add_device(target, device, instruction, file_name, step):
@@ -41,6 +76,7 @@ def read_ladder_csv_files(sample_dir):
     inputs = {}
     outputs = {}
     raw_rows = []
+    device_usage = {}
 
     for sample_path in sorted(sample_dir.glob("*.csv")):
         current_io_type = None
@@ -57,6 +93,16 @@ def read_ladder_csv_files(sample_dir):
                 instruction = row[INSTRUCTION_INDEX].strip()
                 device = row[DEVICE_INDEX].strip()
                 note = row[NOTE_INDEX].strip() if len(row) > NOTE_INDEX else ""
+
+                if device and device != "I/O(デバイス)":
+                    add_device_usage(
+                        device_usage,
+                        device,
+                        instruction,
+                        sample_path.name,
+                        row_number,
+                        step,
+                    )
 
                 if is_note_only_row(row, note) and current_device:
                     if current_io_type == "INPUT":
@@ -88,4 +134,4 @@ def read_ladder_csv_files(sample_dir):
                     current_io_type = "OUTPUT"
                     current_device = device
 
-    return inputs, outputs, raw_rows
+    return inputs, outputs, raw_rows, device_usage

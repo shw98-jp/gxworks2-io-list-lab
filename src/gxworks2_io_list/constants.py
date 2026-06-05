@@ -41,3 +41,13 @@ RAW_FIELDNAMES = [
     "Device",
     "LogicNote",
 ]
+
+DEVICE_USAGE_FIELDNAMES = [
+    "No",
+    "DeviceType",
+    "Device",
+    "Occurrences",
+    "UsedFiles",
+    "Instructions",
+    "Locations",
+]
