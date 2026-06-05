@@ -5,6 +5,49 @@ from openpyxl.utils import get_column_letter
 from .constants import CHECK_FIELDNAMES, IO_FIELDNAMES, RAW_FIELDNAMES
 
 
+CHECK_LEVEL_ORDER = {
+    "ERROR": 0,
+    "WARN": 1,
+    "INFO": 2,
+}
+
+CHECK_LEVEL_FILLS = {
+    "ERROR": PatternFill("solid", fgColor="F4CCCC"),
+    "WARN": PatternFill("solid", fgColor="FFF2CC"),
+    "INFO": PatternFill("solid", fgColor="D9EAF7"),
+}
+
+
+def check_sort_key(row):
+    level = row.get("Level", "")
+    category = row.get("Category", "")
+    device = row.get("Device", "")
+    check_type = row.get("Type", "")
+
+    return (
+        CHECK_LEVEL_ORDER.get(level, 99),
+        category,
+        device,
+        check_type,
+    )
+
+
+def count_check_levels(check_rows):
+    counts = {
+        "ERROR": 0,
+        "WARN": 0,
+        "INFO": 0,
+    }
+
+    for row in check_rows:
+        level = row.get("Level", "")
+
+        if level in counts:
+            counts[level] += 1
+
+    return counts
+
+
 def write_sheet(ws, rows, fieldnames):
     ws.append(fieldnames)
 
@@ -32,6 +75,22 @@ def write_sheet(ws, rows, fieldnames):
         ws.column_dimensions[column_letter].width = min(max_length + 2, 80)
 
 
+def write_check_sheet(ws, check_rows):
+    sorted_rows = sorted(check_rows, key=check_sort_key)
+
+    write_sheet(ws, sorted_rows, CHECK_FIELDNAMES)
+
+    for row in ws.iter_rows(min_row=2):
+        level = row[0].value
+        fill = CHECK_LEVEL_FILLS.get(level)
+
+        if fill is None:
+            continue
+
+        for cell in row:
+            cell.fill = fill
+
+
 def write_summary_sheet(
     ws,
     input_rows,
@@ -40,6 +99,8 @@ def write_summary_sheet(
     ladder_source_count,
     comment_count,
 ):
+    check_level_counts = count_check_levels(check_rows)
+
     ws.append(["Item", "Value"])
     ws.append(["Ladder CSV files", ladder_source_count])
     ws.append(["Device comments", comment_count])
@@ -47,6 +108,9 @@ def write_summary_sheet(
     ws.append(["Output devices", len(output_rows)])
     ws.append(["Total devices", len(input_rows) + len(output_rows)])
     ws.append(["Check items", len(check_rows)])
+    ws.append(["Check ERROR", check_level_counts["ERROR"]])
+    ws.append(["Check WARN", check_level_counts["WARN"]])
+    ws.append(["Check INFO", check_level_counts["INFO"]])
 
     header_fill = PatternFill("solid", fgColor="D9EAF7")
     header_font = Font(bold=True)
@@ -90,7 +154,7 @@ def write_io_list_excel(
     write_sheet(output_ws, output_rows, IO_FIELDNAMES)
 
     check_ws = wb.create_sheet("CHECK")
-    write_sheet(check_ws, check_rows, CHECK_FIELDNAMES)
+    write_check_sheet(check_ws, check_rows)
 
     raw_ws = wb.create_sheet("RAW_DATA")
     write_sheet(raw_ws, raw_rows, RAW_FIELDNAMES)
