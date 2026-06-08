@@ -45,12 +45,15 @@ def build_output_rows(io_type, devices, device_comments):
 def build_device_usage_rows(device_usage):
     rows = []
 
-    for index, device in enumerate(sorted(device_usage, key=device_sort_key), start=1):
+    for device in sorted(device_usage, key=device_sort_key):
         item = device_usage[device]
+
+        if item["device_type"] in ("X", "Y"):
+            continue
 
         rows.append(
             {
-                "No": index,
+                "No": len(rows) + 1,
                 "DeviceType": item["device_type"],
                 "Device": item["device"],
                 "Occurrences": item["occurrences"],
