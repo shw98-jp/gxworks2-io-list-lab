@@ -72,21 +72,40 @@ def is_note_only_row(row, note):
     )
 
 
+def get_project_name_from_first_row(row):
+    if not row:
+        return ""
+
+    return row[0].strip()
+
+
+def is_data_row(row_number, row):
+    if row_number <= 3:
+        return False
+
+    return len(row) > DEVICE_INDEX
+
+
 def read_ladder_csv_files(sample_dir):
     inputs = {}
     outputs = {}
     raw_rows = []
     device_usage = {}
+    project_name = ""
 
     for sample_path in sorted(sample_dir.glob("*.csv")):
         current_io_type = None
         current_device = None
+        current_instruction = ""
 
         with sample_path.open("r", encoding="utf-16", newline="") as file:
             reader = csv.reader(file, delimiter="\t")
 
             for row_number, row in enumerate(reader, start=1):
-                if len(row) <= DEVICE_INDEX:
+                if row_number == 1 and not project_name:
+                    project_name = get_project_name_from_first_row(row)
+
+                if not is_data_row(row_number, row):
                     continue
 
                 step = row[STEP_INDEX].strip()
@@ -94,11 +113,16 @@ def read_ladder_csv_files(sample_dir):
                 device = row[DEVICE_INDEX].strip()
                 note = row[NOTE_INDEX].strip() if len(row) > NOTE_INDEX else ""
 
-                if device and device != "I/O(デバイス)":
+                if instruction:
+                    current_instruction = instruction
+
+                effective_instruction = instruction or current_instruction
+
+                if device:
                     add_device_usage(
                         device_usage,
                         device,
-                        instruction,
+                        effective_instruction,
                         sample_path.name,
                         row_number,
                         step,
@@ -119,19 +143,19 @@ def read_ladder_csv_files(sample_dir):
                         "SourceFile": sample_path.name,
                         "RowNumber": row_number,
                         "Step": step,
-                        "Instruction": instruction,
+                        "Instruction": effective_instruction,
                         "Device": device,
                         "LogicNote": note,
                     }
                 )
 
                 if device.startswith("X"):
-                    add_device(inputs, device, instruction, sample_path.name, step)
+                    add_device(inputs, device, effective_instruction, sample_path.name, step)
                     current_io_type = "INPUT"
                     current_device = device
                 elif device.startswith("Y"):
-                    add_device(outputs, device, instruction, sample_path.name, step)
+                    add_device(outputs, device, effective_instruction, sample_path.name, step)
                     current_io_type = "OUTPUT"
                     current_device = device
 
-    return inputs, outputs, raw_rows, device_usage
+    return inputs, outputs, raw_rows, device_usage, project_name

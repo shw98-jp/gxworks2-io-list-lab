@@ -44,6 +44,7 @@ RAW_FIELDNAMES = [
 
 DEVICE_USAGE_FIELDNAMES = [
     "No",
+    "UsageCategory",
     "DeviceType",
     "Device",
     "DeviceComment",

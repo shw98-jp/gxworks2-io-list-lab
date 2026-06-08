@@ -104,6 +104,7 @@ def write_check_sheet(ws, check_rows):
 
 def write_summary_sheet(
     ws,
+    metadata,
     input_rows,
     output_rows,
     check_rows,
@@ -114,6 +115,12 @@ def write_summary_sheet(
     check_level_counts = count_check_levels(check_rows)
 
     ws.append(["Item", "Value"])
+    ws.append(["Project name", metadata["ProjectName"]])
+    ws.append(["Generated at", metadata["GeneratedAt"]])
+    ws.append(["Ladder CSV folder", metadata["LadderCsvFolder"]])
+    ws.append(["Device comment file", metadata["DeviceCommentFile"]])
+    ws.append(["Output CSV", metadata["OutputCsv"]])
+    ws.append(["Output Excel", metadata["OutputExcel"]])
     ws.append(["Ladder CSV files", ladder_source_count])
     ws.append(["Device comments", comment_count])
     ws.append(["Input devices", len(input_rows)])
@@ -138,6 +145,7 @@ def write_summary_sheet(
 
 def write_io_list_excel(
     output_path,
+    metadata,
     input_rows,
     output_rows,
     check_rows,
@@ -154,6 +162,7 @@ def write_io_list_excel(
     summary_ws.title = "SUMMARY"
     write_summary_sheet(
         summary_ws,
+        metadata,
         input_rows,
         output_rows,
         check_rows,

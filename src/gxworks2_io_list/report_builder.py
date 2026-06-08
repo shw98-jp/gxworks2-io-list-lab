@@ -42,6 +42,22 @@ def build_output_rows(io_type, devices, device_comments):
     return rows
 
 
+def get_device_usage_category(device_type):
+    if device_type in ("K", "H"):
+        return "Constant"
+
+    if device_type in ("SM", "SD"):
+        return "SpecialDevice"
+
+    if device_type in ("D", "M", "L", "B", "W", "R", "ZR"):
+        return "InternalDevice"
+
+    if device_type in ("T", "C"):
+        return "TimerCounter"
+
+    return "Other"
+
+
 def build_device_usage_rows(device_usage, device_comments):
     rows = []
 
@@ -54,6 +70,7 @@ def build_device_usage_rows(device_usage, device_comments):
         rows.append(
             {
                 "No": len(rows) + 1,
+                "UsageCategory": get_device_usage_category(item["device_type"]),
                 "DeviceType": item["device_type"],
                 "Device": item["device"],
                 "DeviceComment": device_comments.get(item["device"], ""),
