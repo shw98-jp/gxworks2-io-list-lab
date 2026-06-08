@@ -4,9 +4,15 @@ from openpyxl.utils import get_column_letter
 
 from .constants import (
     CHECK_FIELDNAMES,
+    DEVICE_TYPE_REFERENCE_FIELDNAMES,
     DEVICE_USAGE_FIELDNAMES,
+    INSTRUCTION_REFERENCE_FIELDNAMES,
     IO_FIELDNAMES,
     RAW_FIELDNAMES,
+)
+from .reference_data import (
+    DEVICE_TYPE_REFERENCE_ROWS,
+    INSTRUCTION_REFERENCE_ROWS,
 )
 
 
@@ -167,6 +173,20 @@ def write_io_list_excel(
 
     device_usage_ws = wb.create_sheet("DEVICE_USAGE")
     write_sheet(device_usage_ws, device_usage_rows, DEVICE_USAGE_FIELDNAMES)
+
+    instruction_reference_ws = wb.create_sheet("INSTRUCTION_REFERENCE")
+    write_sheet(
+        instruction_reference_ws,
+        INSTRUCTION_REFERENCE_ROWS,
+        INSTRUCTION_REFERENCE_FIELDNAMES,
+    )
+
+    device_type_reference_ws = wb.create_sheet("DEVICE_TYPE_REFERENCE")
+    write_sheet(
+        device_type_reference_ws,
+        DEVICE_TYPE_REFERENCE_ROWS,
+        DEVICE_TYPE_REFERENCE_FIELDNAMES,
+    )
 
     raw_ws = wb.create_sheet("RAW_DATA")
     write_sheet(raw_ws, raw_rows, RAW_FIELDNAMES)

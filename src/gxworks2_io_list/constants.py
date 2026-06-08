@@ -51,3 +51,17 @@ DEVICE_USAGE_FIELDNAMES = [
     "Instructions",
     "Locations",
 ]
+
+INSTRUCTION_REFERENCE_FIELDNAMES = [
+    "Instruction",
+    "Meaning",
+    "LadderExample",
+    "Description",
+]
+
+DEVICE_TYPE_REFERENCE_FIELDNAMES = [
+    "DeviceType",
+    "Meaning",
+    "Example",
+    "Description",
+]

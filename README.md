@@ -32,6 +32,8 @@
 - DeviceComment列としてI/O一覧に結合
 - CHECKシートで確認項目を出力
 - DEVICE_USAGEシートでX/Y以外のデバイス・定数の使用状況を出力
+- INSTRUCTION_REFERENCEシートで基本ラダー命令の意味を説明
+- DEVICE_TYPE_REFERENCEシートでPLCデバイス種別の意味を説明
 - RAW_DATAシートで解析元データを追跡可能にする
 - CSVとExcelの両方でレポートを出力
 
@@ -50,6 +52,8 @@ INPUT
 OUTPUT
 CHECK
 DEVICE_USAGE
+INSTRUCTION_REFERENCE
+DEVICE_TYPE_REFERENCE
 RAW_DATA
 ```
 
@@ -126,6 +130,19 @@ UsedFiles
 Instructions
 Locations
 ```
+
+## REFERENCEシート
+
+Excelレポートには、PLC初学者が結果を読みやすくするための参考シートも出力します。
+
+```text
+INSTRUCTION_REFERENCE
+DEVICE_TYPE_REFERENCE
+```
+
+`INSTRUCTION_REFERENCE`では、`LD`、`AND`、`OR`、`OUT`、`SET`、`RST`、`MOV`、`DMOV`などの基本ラダー命令の意味を整理します。
+
+`DEVICE_TYPE_REFERENCE`では、`X`、`Y`、`M`、`SM`、`D`、`SD`、`K`などのPLCデバイス種別の意味を整理します。
 
 ## DeviceCommentとLogicNotesの違い
 
