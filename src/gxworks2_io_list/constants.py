@@ -46,6 +46,7 @@ DEVICE_USAGE_FIELDNAMES = [
     "No",
     "DeviceType",
     "Device",
+    "DeviceComment",
     "Occurrences",
     "UsedFiles",
     "Instructions",

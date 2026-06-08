@@ -42,7 +42,7 @@ def build_output_rows(io_type, devices, device_comments):
     return rows
 
 
-def build_device_usage_rows(device_usage):
+def build_device_usage_rows(device_usage, device_comments):
     rows = []
 
     for device in sorted(device_usage, key=device_sort_key):
@@ -56,6 +56,7 @@ def build_device_usage_rows(device_usage):
                 "No": len(rows) + 1,
                 "DeviceType": item["device_type"],
                 "Device": item["device"],
+                "DeviceComment": device_comments.get(item["device"], ""),
                 "Occurrences": item["occurrences"],
                 "UsedFiles": ",".join(sorted(item["files"])),
                 "Instructions": ",".join(sorted(item["instructions"])),

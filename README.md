@@ -1,43 +1,77 @@
-﻿# GX Works2 I/O List Lab
+# GX Works2 I/O List Lab
 
 ## 概要
 
-このリポジトリは、Mitsubishi GX Works2から出力したCSVデータをPythonで解析し、PLCのI/Oリスト整理と確認作業を自動化するための学習・研究プロジェクトです。
+GX Works2 I/O List Labは、Mitsubishi GX Works2から出力したラダーCSVとデバイスコメントCSVをPythonで解析し、PLCプログラムのI/O使用状況、コメント情報、確認項目をExcelレポートとして整理する学習・研究プロジェクトです。
 
-目的は、GX Works2のCSV出力をそのまま見るだけではなく、ラダー内で実際に使用されているX/Yデバイスを抽出し、Device Commentと結合して、確認しやすいExcelレポートとして出力することです。
+このツールはPLCを制御するためのものではありません。目的は、GX Works2のCSV出力をもとに、既存プログラムの確認、文書化、保守レビューを補助することです。
 
-## 目的
+## 背景
 
-このプロジェクトは、ポートフォリオであると同時に、PLC実務で発生しやすい文書整理・確認作業をPythonでどこまで自動化できるかを試すための記録です。
+PLCのI/Oリストは、本来は設備仕様、電気図面、I/O割付をもとに作成され、PLCプログラムはその情報に従って作られます。
 
-特に以下のような確認作業を補助することを目指しています。
+一方で、既存設備の保守や改造では、以下のような状況が起こります。
 
-- ラダーCSV内で使用されているX/Yデバイスの抽出
-- 入力(INPUT)と出力(OUTPUT)の分類
-- Device Comment CSVとの結合
-- ロジック周辺のノート情報の整理
-- コメント未登録や複数箇所使用などの確認項目の出力
-- Excel形式のI/Oレポート作成
+- I/Oリストが最新か分からない
+- Device Commentが未登録または古い
+- どのラダープログラムで特定のI/Oが使われているか確認したい
+- Dレジスタ、SM/SDなどの内部デバイス使用箇所を追いたい
+- ラダーCSVとコメント情報を照合して、確認すべき項目を整理したい
 
-## 現在の機能
+このプロジェクトでは、そのような確認作業をPythonで補助できるかを試しています。
 
-- GX Works2ラダーCSVの読み込み
-- フォルダ内の複数CSVファイルを一括解析
-- X/Yデバイスのみを抽出
-- XをINPUT、YをOUTPUTとして分類
-- Mitsubishi PLCのX/Yアドレスを16進数基準で並び替え
-- 同一デバイスの重複使用をまとめて表示
-- ラダーCSV内のノート行をLogicNotesとして関連付け
-- グローバルデバイスコメントCSVを読み込み
-- DeviceComment列としてI/O一覧に結合
-- CHECKシートで確認項目を出力
-- DEVICE_USAGEシートでX/Y以外のデバイス・定数の使用状況を出力
-- INSTRUCTION_REFERENCEシートで基本ラダー命令の意味を説明
-- DEVICE_TYPE_REFERENCEシートでPLCデバイス種別の意味を説明
-- RAW_DATAシートで解析元データを追跡可能にする
-- CSVとExcelの両方でレポートを出力
+## このツールが行うこと
 
-## 出力ファイル
+- GX Works2ラダーCSVを読み込む
+- フォルダ内の複数ラダーCSVを一括解析する
+- 実際に使用されているX/Yデバイスを抽出する
+- XをINPUT、YをOUTPUTとして分類する
+- Mitsubishi PLCのX/Yアドレスを16進数基準で並び替える
+- 同一デバイスの複数使用をまとめる
+- ラダーCSV内のノート行をLogicNotesとして関連付ける
+- グローバルデバイスコメントCSVを読み込む
+- DeviceCommentをINPUT/OUTPUT/DEVICE_USAGEに結合する
+- コメント未登録、複数箇所使用、未使用コメントなどの確認項目をCHECKシートに出力する
+- X/Y以外の内部デバイスや定数をDEVICE_USAGEシートに整理する
+- 解析元の行情報をRAW_DATAシートに出力する
+- PLC初学者向けに命令語とデバイス種別の参考シートを出力する
+
+## このツールが行わないこと
+
+- PLCプログラムの正誤を自動判定すること
+- GX Works2プロジェクトファイルを直接解析すること
+- 電気図面、端子台、盤内配線情報を自動生成すること
+- 完全な実務I/Oリストを単独で作成すること
+- PLC制御ロジックを自動生成または変更すること
+
+このツールの位置づけは、I/Oリスト作成そのものを置き換えるものではなく、GX Works2から出力した情報をもとにした文書化・確認・保守レビューの補助です。
+
+## 入力データ
+
+使用する入力データはGX Works2から出力したCSVです。
+
+```text
+samples/ladder/*.csv
+samples/device_comments/device_comments.csv
+```
+
+想定している形式:
+
+```text
+ラダーCSV:
+- encoding: utf-16
+- delimiter: tab
+- columns: ステップ番号, 命令, I/O(デバイス), ノート など
+
+Device Comment CSV:
+- encoding: utf-16
+- delimiter: tab
+- columns: デバイス名, コメント
+```
+
+## 出力データ
+
+実行後、以下のファイルを生成します。
 
 ```text
 output/io_list.csv
@@ -46,41 +80,20 @@ output/io_list_report.xlsx
 
 Excelレポートには以下のシートを出力します。
 
-```text
-SUMMARY
-INPUT
-OUTPUT
-CHECK
-DEVICE_USAGE
-INSTRUCTION_REFERENCE
-DEVICE_TYPE_REFERENCE
-RAW_DATA
-```
+| Sheet | 内容 |
+|---|---|
+| SUMMARY | 解析結果の件数概要 |
+| INPUT | Xデバイスの一覧 |
+| OUTPUT | Yデバイスの一覧 |
+| CHECK | 人が確認すべき項目 |
+| DEVICE_USAGE | X/Y以外の内部デバイス・定数の使用状況 |
+| INSTRUCTION_REFERENCE | 基本ラダー命令の説明 |
+| DEVICE_TYPE_REFERENCE | PLCデバイス種別の説明 |
+| RAW_DATA | 解析元ラダーCSV行の追跡情報 |
 
-## CHECKシートの確認項目
+## CHECKシート
 
-CHECKシートは、エラーを断定するものではなく、人が確認すべき項目をまとめるためのシートです。
-
-現在は以下の項目を出力します。
-
-```text
-MISSING_DEVICE_COMMENT
-MISSING_LOGIC_NOTE
-MULTIPLE_USED_FILES
-MULTIPLE_LOGIC_NOTES
-COMMENTED_BUT_NOT_USED
-SPARE_OR_UNUSED_DEVICE
-```
-
-CHECKシートでは、確認項目を以下のカテゴリに分類します。
-
-```text
-Documentation
-Usage
-LogicContext
-```
-
-各項目の意味は以下の通りです。
+CHECKシートは、エラーを断定するものではありません。人が確認すべき候補をまとめるためのシートです。
 
 | Type | Level | Category | 意味 | 実務での確認観点 |
 |---|---|---|---|---|
@@ -91,24 +104,31 @@ LogicContext
 | COMMENTED_BUT_NOT_USED | WARN | Documentation | Device Commentは登録されているが、ラダーCSVでは使用されていない | 予備アドレス、削除済みロジックの残り、または解析対象外プログラムの可能性を確認する |
 | SPARE_OR_UNUSED_DEVICE | INFO | Documentation | 予備・未使用として登録されており、ラダーCSVでも使用されていない | 正常な予備アドレスである可能性が高く、基本的には参考情報として扱う |
 
-簡単に表現すると、各CHECK項目は以下のような確認を行います。
+## DeviceCommentとLogicNotesの違い
 
-| Type | 確認すること |
-|---|---|
-| MISSING_DEVICE_COMMENT | このアドレスは使われているのに、名前や説明が未登録ではないか |
-| MISSING_LOGIC_NOTE | このロジック周辺の説明が不足していないか |
-| MULTIPLE_USED_FILES | このアドレスが複数プログラムで使われており、影響範囲が広くないか |
-| MULTIPLE_LOGIC_NOTES | このアドレスに複数の説明が付いており、意味を誤解しないか |
-| COMMENTED_BUT_NOT_USED | コメントはあるが、実際には使われていないアドレスではないか |
-| SPARE_OR_UNUSED_DEVICE | 予備・未使用として管理されているアドレスではないか |
+`DeviceComment`は、デバイスアドレス自体に付けられた説明です。
+
+```text
+X50 = CH1 count start signal
+```
+
+これは「このアドレスは何か」を表します。
+
+`LogicNotes`は、ラダーCSV内でロジックの近くに書かれている説明です。
+
+```text
+X50がONしたとき、Count enable commandをONする
+```
+
+これは「このロジックは何をしているか」を表します。
+
+そのため、I/OリストではDeviceCommentを信号名として扱い、LogicNotesはロジック文脈の参考情報として扱います。
 
 ## DEVICE_USAGEシート
 
 `DEVICE_USAGE`シートは、I/Oリストには含めない内部デバイスや定数の使用状況を確認するための補助シートです。
 
-X/Yデバイスは`INPUT`、`OUTPUT`シートで確認するため、`DEVICE_USAGE`シートではX/Yを除外し、内部デバイスや定数を中心に出力します。
-
-対象例:
+X/Yデバイスは`INPUT`、`OUTPUT`シートで確認するため、`DEVICE_USAGE`シートではX/Yを除外し、以下のようなデバイスを中心に出力します。
 
 ```text
 SM
@@ -120,51 +140,32 @@ T
 C
 ```
 
-I/Oリストの主対象はX/Yですが、PLCプログラムの理解や保守では、内部リレー、特殊レジスタ、データレジスタ、定数がどこで使われているかを確認する場面があります。
-
-このシートでは、各デバイスについて以下を出力します。
+出力項目:
 
 ```text
 DeviceType
 Device
+DeviceComment
 Occurrences
 UsedFiles
 Instructions
 Locations
 ```
 
+これにより、Dレジスタ、特殊リレー、特殊データレジスタ、定数がどこで使用されているかを確認できます。
+
 ## REFERENCEシート
 
-Excelレポートには、PLC初学者が結果を読みやすくするための参考シートも出力します。
+Excelレポートには、PLC初学者やレビュー担当者が結果を読みやすくするための参考シートも出力します。
 
 ```text
 INSTRUCTION_REFERENCE
 DEVICE_TYPE_REFERENCE
 ```
 
-`INSTRUCTION_REFERENCE`では、`LD`、`AND`、`OR`、`OUT`、`SET`、`RST`、`MOV`、`DMOV`などの基本ラダー命令の意味を整理します。
+`INSTRUCTION_REFERENCE`では、`LD`、`AND`、`OR`、`ANI`、`OUT`、`SET`、`RST`、`MOV`、`DMOV`などの基本ラダー命令を説明します。
 
-`DEVICE_TYPE_REFERENCE`では、`X`、`Y`、`M`、`SM`、`D`、`SD`、`K`などのPLCデバイス種別の意味を整理します。
-
-## DeviceCommentとLogicNotesの違い
-
-`DeviceComment`は、PLCデバイスアドレス自体に付けられた説明です。
-
-例:
-
-```text
-X50 = CH1 count start signal
-```
-
-`LogicNotes`は、ラダーCSV内でロジックの近くに書かれている説明です。
-
-例:
-
-```text
-X50がONしたとき、Count enable commandをONする
-```
-
-つまり、`DeviceComment`は「このアドレスは何か」、`LogicNotes`は「このロジックは何をしているか」を表します。
+`DEVICE_TYPE_REFERENCE`では、`X`、`Y`、`M`、`SM`、`D`、`SD`、`K`などのPLCデバイス種別を説明します。
 
 ## 処理の流れ
 
@@ -176,15 +177,8 @@ GX Works2
 → X/Yデバイスを抽出
 → DeviceCommentと結合
 → CHECK項目を生成
+→ DEVICE_USAGEを生成
 → Excelレポートを作成
-```
-
-## サンプルデータについて
-
-このプロジェクトでは、Mitsubishi Electricが公開しているGX Works2サンプルプロジェクトを学習目的で使用しています。
-
-```text
-https://www.mitsubishielectric-fa.cn/fb/english/melsoft_library/fa/products/cnt/plceng/download/library/mitsubishi/ld_lcpu_e/index.html
 ```
 
 ## 実行方法
@@ -195,3 +189,16 @@ python main.py
 
 実行後、`output`フォルダにCSVとExcelレポートが生成されます。
 
+## サンプルデータ
+
+このプロジェクトでは、Mitsubishi Electricが公開しているGX Works2サンプルプロジェクトを学習目的で使用しています。
+
+```text
+https://www.mitsubishielectric-fa.cn/fb/english/melsoft_library/fa/products/cnt/plceng/download/library/mitsubishi/ld_lcpu_e/index.html
+```
+
+## プロジェクトの位置づけ
+
+このプロジェクトは、PLC制御プログラムを作るためのものではなく、PLCエンジニアリングにおける確認・文書化・保守レビューを補助するための実験的なツールです。
+
+AIやPythonを使って、GX Works2から得られるデータをどのように整理し、実務に近い確認作業へつなげられるかを学ぶことを目的としています。

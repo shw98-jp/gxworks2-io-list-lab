@@ -22,7 +22,7 @@ def main():
 
     input_rows = build_output_rows("INPUT", inputs, device_comments)
     output_rows = build_output_rows("OUTPUT", outputs, device_comments)
-    device_usage_rows = build_device_usage_rows(device_usage)
+    device_usage_rows = build_device_usage_rows(device_usage, device_comments)
     all_rows = input_rows + output_rows
     check_rows = build_check_rows(inputs, outputs, device_comments)
     ladder_source_count = len(list(SAMPLE_DIR.glob("*.csv")))
