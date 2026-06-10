@@ -33,6 +33,15 @@ CHECK_FIELDNAMES = [
     "Details",
 ]
 
+CHECK_REFERENCE_FIELDNAMES = [
+    "Type",
+    "Level",
+    "Category",
+    "Meaning",
+    "ReviewPoint",
+    "SuggestedAction",
+]
+
 RAW_FIELDNAMES = [
     "SourceFile",
     "RowNumber",
@@ -63,6 +72,7 @@ INSTRUCTION_REFERENCE_FIELDNAMES = [
 
 DEVICE_TYPE_REFERENCE_FIELDNAMES = [
     "DeviceType",
+    "UsageCategory",
     "Meaning",
     "Example",
     "Description",

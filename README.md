@@ -86,6 +86,7 @@ Excelレポートには以下のシートを出力します。
 | INPUT | Xデバイスの一覧 |
 | OUTPUT | Yデバイスの一覧 |
 | CHECK | 人が確認すべき項目 |
+| CHECK_REFERENCE | CHECK項目の意味、確認ポイント、対応例 |
 | DEVICE_USAGE | X/Y以外の内部デバイス・定数の使用状況 |
 | INSTRUCTION_REFERENCE | 基本ラダー命令の説明 |
 | DEVICE_TYPE_REFERENCE | PLCデバイス種別の説明 |
@@ -172,11 +173,14 @@ Excelレポートには、PLC初学者やレビュー担当者が結果を読み
 ```text
 INSTRUCTION_REFERENCE
 DEVICE_TYPE_REFERENCE
+CHECK_REFERENCE
 ```
 
 `INSTRUCTION_REFERENCE`では、`LD`、`AND`、`OR`、`ANI`、`OUT`、`SET`、`RST`、`MOV`、`DMOV`などの基本ラダー命令を説明します。
 
 `DEVICE_TYPE_REFERENCE`では、`X`、`Y`、`M`、`SM`、`D`、`SD`、`K`などのPLCデバイス種別を説明します。
+
+`CHECK_REFERENCE`では、`MISSING_DEVICE_COMMENT`、`MULTIPLE_USED_FILES`などのCHECK項目について、意味、確認ポイント、対応例を説明します。
 
 ## 処理の流れ
 
