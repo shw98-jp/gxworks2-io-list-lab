@@ -18,6 +18,20 @@ def is_spare_or_unused_comment(comment):
     )
 
 
+def make_check_row(level, priority, category, check_type, device, message, details):
+    return {
+        "Level": level,
+        "Priority": priority,
+        "ReviewStatus": "OPEN",
+        "Category": category,
+        "Type": check_type,
+        "Device": device,
+        "Message": message,
+        "Details": details,
+        "ReviewerNote": "",
+    }
+
+
 def build_output_rows(io_type, devices, device_comments):
     rows = []
 
@@ -97,50 +111,54 @@ def build_check_rows(inputs, outputs, device_comments):
 
         if device not in device_comments:
             check_rows.append(
-                {
-                    "Level": "WARN",
-                    "Category": "Documentation",
-                    "Type": "MISSING_DEVICE_COMMENT",
-                    "Device": device,
-                    "Message": "This I/O device is used in ladder CSV, but no device comment is registered.",
-                    "Details": ",".join(sorted(item["files"])),
-                }
+                make_check_row(
+                    "WARN",
+                    "P1",
+                    "Documentation",
+                    "MISSING_DEVICE_COMMENT",
+                    device,
+                    "This I/O device is used in ladder CSV, but no device comment is registered.",
+                    ",".join(sorted(item["files"])),
+                )
             )
 
         if not item["logic_notes"]:
             check_rows.append(
-                {
-                    "Level": "INFO",
-                    "Category": "LogicContext",
-                    "Type": "MISSING_LOGIC_NOTE",
-                    "Device": device,
-                    "Message": "No nearby ladder logic note was found for this device.",
-                    "Details": ",".join(sorted(item["files"])),
-                }
+                make_check_row(
+                    "INFO",
+                    "P3",
+                    "LogicContext",
+                    "MISSING_LOGIC_NOTE",
+                    device,
+                    "No nearby ladder logic note was found for this device.",
+                    ",".join(sorted(item["files"])),
+                )
             )
 
         if len(item["files"]) > 1:
             check_rows.append(
-                {
-                    "Level": "WARN",
-                    "Category": "Usage",
-                    "Type": "MULTIPLE_USED_FILES",
-                    "Device": device,
-                    "Message": "This I/O device is referenced in multiple ladder CSV files. Check whether the shared usage is intentional.",
-                    "Details": ",".join(sorted(item["files"])),
-                }
+                make_check_row(
+                    "WARN",
+                    "P2",
+                    "Usage",
+                    "MULTIPLE_USED_FILES",
+                    device,
+                    "This I/O device is referenced in multiple ladder CSV files. Check whether the shared usage is intentional.",
+                    ",".join(sorted(item["files"])),
+                )
             )
 
         if len(item["logic_notes"]) > 1:
             check_rows.append(
-                {
-                    "Level": "WARN",
-                    "Category": "LogicContext",
-                    "Type": "MULTIPLE_LOGIC_NOTES",
-                    "Device": device,
-                    "Message": "Multiple logic notes were linked to this device. Review the context before using them as signal descriptions.",
-                    "Details": ",".join(sorted(item["logic_notes"])),
-                }
+                make_check_row(
+                    "WARN",
+                    "P2",
+                    "LogicContext",
+                    "MULTIPLE_LOGIC_NOTES",
+                    device,
+                    "Multiple logic notes were linked to this device. Review the context before using them as signal descriptions.",
+                    ",".join(sorted(item["logic_notes"])),
+                )
             )
 
     commented_io_devices = {
@@ -155,26 +173,28 @@ def build_check_rows(inputs, outputs, device_comments):
 
         if is_spare_or_unused_comment(device_comment):
             check_rows.append(
-                {
-                    "Level": "INFO",
-                    "Category": "Documentation",
-                    "Type": "SPARE_OR_UNUSED_DEVICE",
-                    "Device": device,
-                    "Message": "This X/Y device is documented as spare or unused and was not found in ladder CSV.",
-                    "Details": device_comment,
-                }
+                make_check_row(
+                    "INFO",
+                    "P3",
+                    "Documentation",
+                    "SPARE_OR_UNUSED_DEVICE",
+                    device,
+                    "This X/Y device is documented as spare or unused and was not found in ladder CSV.",
+                    device_comment,
+                )
             )
             continue
 
         check_rows.append(
-            {
-                "Level": "WARN",
-                "Category": "Documentation",
-                "Type": "COMMENTED_BUT_NOT_USED",
-                "Device": device,
-                "Message": "A device comment is registered, but this X/Y device was not found in ladder CSV. Check whether it is obsolete, spare, or missing from the analyzed ladder files.",
-                "Details": device_comment,
-            }
+            make_check_row(
+                "WARN",
+                "P2",
+                "Documentation",
+                "COMMENTED_BUT_NOT_USED",
+                device,
+                "A device comment is registered, but this X/Y device was not found in ladder CSV. Check whether it is obsolete, spare, or missing from the analyzed ladder files.",
+                device_comment,
+            )
         )
 
     return check_rows

@@ -86,7 +86,7 @@ Excelレポートには以下のシートを出力します。
 | INPUT | Xデバイスの一覧 |
 | OUTPUT | Yデバイスの一覧 |
 | CHECK | 人が確認すべき項目 |
-| CHECK_REFERENCE | CHECK項目の意味、確認ポイント、対応例 |
+| CHECK_REFERENCE | CHECK項目の意味、優先度、確認ポイント、対応例 |
 | DEVICE_USAGE | X/Y以外の内部デバイス・定数の使用状況 |
 | INSTRUCTION_REFERENCE | 基本ラダー命令の説明 |
 | DEVICE_TYPE_REFERENCE | PLCデバイス種別の説明 |
@@ -95,6 +95,11 @@ Excelレポートには以下のシートを出力します。
 ## CHECKシート
 
 CHECKシートは、エラーを断定するものではありません。人が確認すべき候補をまとめるためのシートです。
+
+CHECKシートには、確認作業用の補助列として`Priority`、`ReviewStatus`、`ReviewerNote`を出力します。
+`Priority`は確認の優先度を表し、`P1`は先に確認したい項目、`P2`は通常確認項目、`P3`は参考確認項目です。
+`ReviewStatus`は初期値として`OPEN`を出力し、確認後にExcel上で`DONE`や`SKIP`などに変更する想定です。
+`ReviewerNote`は確認者が判断結果やメモを書き込むための空欄です。
 
 | Type | Level | Category | 意味 | 実務での確認観点 |
 |---|---|---|---|---|
@@ -180,7 +185,7 @@ CHECK_REFERENCE
 
 `DEVICE_TYPE_REFERENCE`では、`X`、`Y`、`M`、`SM`、`D`、`SD`、`K`などのPLCデバイス種別を説明します。
 
-`CHECK_REFERENCE`では、`MISSING_DEVICE_COMMENT`、`MULTIPLE_USED_FILES`などのCHECK項目について、意味、確認ポイント、対応例を説明します。
+`CHECK_REFERENCE`では、`MISSING_DEVICE_COMMENT`、`MULTIPLE_USED_FILES`などのCHECK項目について、意味、優先度、確認ポイント、対応例を説明します。
 
 ## 処理の流れ
 

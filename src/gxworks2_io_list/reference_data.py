@@ -66,6 +66,7 @@ CHECK_REFERENCE_ROWS = [
     {
         "Type": "MISSING_DEVICE_COMMENT",
         "Level": "WARN",
+        "Priority": "P1",
         "Category": "Documentation",
         "Meaning": "An X/Y device is used in ladder CSV, but no device comment is registered.",
         "ReviewPoint": "The signal name or field meaning is unclear from the I/O list.",
@@ -74,6 +75,7 @@ CHECK_REFERENCE_ROWS = [
     {
         "Type": "MISSING_LOGIC_NOTE",
         "Level": "INFO",
+        "Priority": "P3",
         "Category": "LogicContext",
         "Meaning": "No nearby ladder note was found for the X/Y device.",
         "ReviewPoint": "This is not always a defect, but the logic context may be harder to understand.",
@@ -82,6 +84,7 @@ CHECK_REFERENCE_ROWS = [
     {
         "Type": "MULTIPLE_USED_FILES",
         "Level": "WARN",
+        "Priority": "P2",
         "Category": "Usage",
         "Meaning": "The same X/Y device is referenced in multiple ladder CSV files.",
         "ReviewPoint": "A change to this I/O may affect more than one program section.",
@@ -90,6 +93,7 @@ CHECK_REFERENCE_ROWS = [
     {
         "Type": "MULTIPLE_LOGIC_NOTES",
         "Level": "WARN",
+        "Priority": "P2",
         "Category": "LogicContext",
         "Meaning": "Multiple ladder notes were linked to the same X/Y device.",
         "ReviewPoint": "A logic note may describe an operation, not the device name itself.",
@@ -98,6 +102,7 @@ CHECK_REFERENCE_ROWS = [
     {
         "Type": "COMMENTED_BUT_NOT_USED",
         "Level": "WARN",
+        "Priority": "P2",
         "Category": "Documentation",
         "Meaning": "A device comment exists, but the X/Y device was not found in ladder CSV.",
         "ReviewPoint": "The comment may be obsolete, reserved, or the ladder export may be incomplete.",
@@ -106,6 +111,7 @@ CHECK_REFERENCE_ROWS = [
     {
         "Type": "SPARE_OR_UNUSED_DEVICE",
         "Level": "INFO",
+        "Priority": "P3",
         "Category": "Documentation",
         "Meaning": "The X/Y device is commented as spare or unused and was not found in ladder CSV.",
         "ReviewPoint": "This is usually acceptable, but it is useful to keep visible in the report.",

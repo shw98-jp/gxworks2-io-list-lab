@@ -26,16 +26,20 @@ IO_FIELDNAMES = [
 
 CHECK_FIELDNAMES = [
     "Level",
+    "Priority",
+    "ReviewStatus",
     "Category",
     "Type",
     "Device",
     "Message",
     "Details",
+    "ReviewerNote",
 ]
 
 CHECK_REFERENCE_FIELDNAMES = [
     "Type",
     "Level",
+    "Priority",
     "Category",
     "Meaning",
     "ReviewPoint",

@@ -24,6 +24,12 @@ CHECK_LEVEL_ORDER = {
     "INFO": 2,
 }
 
+CHECK_PRIORITY_ORDER = {
+    "P1": 0,
+    "P2": 1,
+    "P3": 2,
+}
+
 CHECK_LEVEL_FILLS = {
     "ERROR": PatternFill("solid", fgColor="F4CCCC"),
     "WARN": PatternFill("solid", fgColor="FFF2CC"),
@@ -33,12 +39,14 @@ CHECK_LEVEL_FILLS = {
 
 def check_sort_key(row):
     level = row.get("Level", "")
+    priority = row.get("Priority", "")
     category = row.get("Category", "")
     device = row.get("Device", "")
     check_type = row.get("Type", "")
 
     return (
         CHECK_LEVEL_ORDER.get(level, 99),
+        CHECK_PRIORITY_ORDER.get(priority, 99),
         category,
         device,
         check_type,
