@@ -12,33 +12,42 @@ INSTRUCTION_INDEX = 2
 DEVICE_INDEX = 3
 NOTE_INDEX = 6
 
-IO_FIELDNAMES = [
+IO_SHEET_FIELDNAMES = [
     "No",
-    "Type",
     "Device",
     "DeviceComment",
-    "AddressNo",
     "UsedFiles",
+    "Steps",
     "Instructions",
     "LogicNotes",
+]
+
+IO_CSV_FIELDNAMES = [
+    "No",
+    "Direction",
+    "Device",
+    "DeviceComment",
+    "UsedFiles",
     "Steps",
+    "Instructions",
+    "LogicNotes",
 ]
 
 CHECK_FIELDNAMES = [
-    "Level",
     "Priority",
+    "Severity",
     "ReviewStatus",
     "Category",
-    "Type",
+    "CheckType",
     "Device",
     "Message",
-    "Details",
+    "Evidence",
     "ReviewerNote",
 ]
 
 CHECK_REFERENCE_FIELDNAMES = [
-    "Type",
-    "Level",
+    "CheckType",
+    "Severity",
     "Priority",
     "Category",
     "Meaning",
@@ -48,8 +57,8 @@ CHECK_REFERENCE_FIELDNAMES = [
 
 RAW_FIELDNAMES = [
     "SourceFile",
-    "RowNumber",
-    "Step",
+    "CsvRow",
+    "StepNo",
     "Instruction",
     "Device",
     "LogicNote",
@@ -57,14 +66,14 @@ RAW_FIELDNAMES = [
 
 DEVICE_USAGE_FIELDNAMES = [
     "No",
-    "UsageCategory",
+    "DeviceCategory",
     "DeviceType",
     "Device",
     "DeviceComment",
     "Occurrences",
     "UsedFiles",
     "Instructions",
-    "Locations",
+    "UsageLocations",
 ]
 
 INSTRUCTION_REFERENCE_FIELDNAMES = [
@@ -76,7 +85,7 @@ INSTRUCTION_REFERENCE_FIELDNAMES = [
 
 DEVICE_TYPE_REFERENCE_FIELDNAMES = [
     "DeviceType",
-    "UsageCategory",
+    "DeviceCategory",
     "Meaning",
     "Example",
     "Description",

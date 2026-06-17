@@ -141,8 +141,8 @@ def read_ladder_csv_files(sample_dir):
                 raw_rows.append(
                     {
                         "SourceFile": sample_path.name,
-                        "RowNumber": row_number,
-                        "Step": step,
+                        "CsvRow": row_number,
+                        "StepNo": step,
                         "Instruction": effective_instruction,
                         "Device": device,
                         "LogicNote": note,

@@ -101,14 +101,14 @@ CHECKシートには、確認作業用の補助列として`Priority`、`ReviewS
 `ReviewStatus`は初期値として`OPEN`を出力し、確認後にExcel上で`DONE`や`SKIP`などに変更する想定です。
 `ReviewerNote`は確認者が判断結果やメモを書き込むための空欄です。
 
-| Type | Level | Category | 意味 | 実務での確認観点 |
-|---|---|---|---|---|
-| MISSING_DEVICE_COMMENT | WARN | Documentation | ラダーではX/Yデバイスが使用されているが、Device Commentが登録されていない | そのアドレスが何のセンサ、ボタン、出力なのか分かりにくいため、Device Commentの補完を検討する |
-| MISSING_LOGIC_NOTE | INFO | LogicContext | 対象X/Yデバイスの近くにラダーノートが見つからない | 必ずしも問題ではない。Device Commentが十分であれば参考情報として扱う |
-| MULTIPLE_USED_FILES | WARN | Usage | 同じX/Yデバイスが複数のラダーCSVで参照されている | 改造や修正時に影響範囲が広がる可能性があるため、使用箇所を確認する |
-| MULTIPLE_LOGIC_NOTES | WARN | LogicContext | 同じX/Yデバイスに複数のLogicNotesが関連付けられている | LogicNotesをそのまま信号名として使わず、ロジック上の文脈として確認する |
-| COMMENTED_BUT_NOT_USED | WARN | Documentation | Device Commentは登録されているが、ラダーCSVでは使用されていない | 予備アドレス、削除済みロジックの残り、または解析対象外プログラムの可能性を確認する |
-| SPARE_OR_UNUSED_DEVICE | INFO | Documentation | 予備・未使用として登録されており、ラダーCSVでも使用されていない | 正常な予備アドレスである可能性が高く、基本的には参考情報として扱う |
+| CheckType | Severity | Priority | Category | 意味 | 実務での確認観点 |
+|---|---|---|---|---|---|
+| MISSING_DEVICE_COMMENT | WARN | P1 | Documentation | ラダーではX/Yデバイスが使用されているが、Device Commentが登録されていない | そのアドレスが何のセンサ、ボタン、出力なのか分かりにくいため、Device Commentの補完を検討する |
+| MISSING_LOGIC_NOTE | INFO | P3 | LogicContext | 対象X/Yデバイスの近くにラダーノートが見つからない | 必ずしも問題ではない。Device Commentが十分であれば参考情報として扱う |
+| MULTIPLE_USED_FILES | WARN | P2 | Usage | 同じX/Yデバイスが複数のラダーCSVで参照されている | 改造や修正時に影響範囲が広がる可能性があるため、使用箇所を確認する |
+| MULTIPLE_LOGIC_NOTES | WARN | P2 | LogicContext | 同じX/Yデバイスに複数のLogicNotesが関連付けられている | LogicNotesをそのまま信号名として使わず、ロジック上の文脈として確認する |
+| COMMENTED_BUT_NOT_USED | WARN | P2 | Documentation | Device Commentは登録されているが、ラダーCSVでは使用されていない | 予備アドレス、削除済みロジックの残り、または解析対象外プログラムの可能性を確認する |
+| SPARE_OR_UNUSED_DEVICE | INFO | P3 | Documentation | 予備・未使用として登録されており、ラダーCSVでも使用されていない | 正常な予備アドレスである可能性が高く、基本的には参考情報として扱う |
 
 ## DeviceCommentとLogicNotesの違い
 
@@ -149,21 +149,21 @@ C
 出力項目:
 
 ```text
-UsageCategory
+DeviceCategory
 DeviceType
 Device
 DeviceComment
 Occurrences
 UsedFiles
 Instructions
-Locations
+UsageLocations
 ```
 
 これにより、Dレジスタ、特殊リレー、特殊データレジスタ、定数がどこで使用されているかを確認できます。
 
-`UsageCategory`では、以下のように用途を大まかに分類します。
+`DeviceCategory`では、以下のように用途を大まかに分類します。
 
-| UsageCategory | 対象例 | 意味 |
+| DeviceCategory | 対象例 | 意味 |
 |---|---|---|
 | InternalDevice | D, M, L, B, W, R, ZR | プログラム内部で使用するデバイス |
 | SpecialDevice | SM, SD | PLC CPUや特殊機能に関連するシステムデバイス |

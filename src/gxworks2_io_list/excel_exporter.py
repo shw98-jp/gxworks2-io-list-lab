@@ -8,7 +8,7 @@ from .constants import (
     DEVICE_TYPE_REFERENCE_FIELDNAMES,
     DEVICE_USAGE_FIELDNAMES,
     INSTRUCTION_REFERENCE_FIELDNAMES,
-    IO_FIELDNAMES,
+    IO_SHEET_FIELDNAMES,
     RAW_FIELDNAMES,
 )
 from .reference_data import (
@@ -18,7 +18,7 @@ from .reference_data import (
 )
 
 
-CHECK_LEVEL_ORDER = {
+CHECK_SEVERITY_ORDER = {
     "ERROR": 0,
     "WARN": 1,
     "INFO": 2,
@@ -30,7 +30,7 @@ CHECK_PRIORITY_ORDER = {
     "P3": 2,
 }
 
-CHECK_LEVEL_FILLS = {
+CHECK_SEVERITY_FILLS = {
     "ERROR": PatternFill("solid", fgColor="F4CCCC"),
     "WARN": PatternFill("solid", fgColor="FFF2CC"),
     "INFO": PatternFill("solid", fgColor="D9EAF7"),
@@ -38,14 +38,14 @@ CHECK_LEVEL_FILLS = {
 
 
 def check_sort_key(row):
-    level = row.get("Level", "")
+    severity = row.get("Severity", "")
     priority = row.get("Priority", "")
     category = row.get("Category", "")
     device = row.get("Device", "")
-    check_type = row.get("Type", "")
+    check_type = row.get("CheckType", "")
 
     return (
-        CHECK_LEVEL_ORDER.get(level, 99),
+        CHECK_SEVERITY_ORDER.get(severity, 99),
         CHECK_PRIORITY_ORDER.get(priority, 99),
         category,
         device,
@@ -53,7 +53,7 @@ def check_sort_key(row):
     )
 
 
-def count_check_levels(check_rows):
+def count_check_severities(check_rows):
     counts = {
         "ERROR": 0,
         "WARN": 0,
@@ -61,10 +61,10 @@ def count_check_levels(check_rows):
     }
 
     for row in check_rows:
-        level = row.get("Level", "")
+        severity = row.get("Severity", "")
 
-        if level in counts:
-            counts[level] += 1
+        if severity in counts:
+            counts[severity] += 1
 
     return counts
 
@@ -101,9 +101,11 @@ def write_check_sheet(ws, check_rows):
 
     write_sheet(ws, sorted_rows, CHECK_FIELDNAMES)
 
+    severity_index = CHECK_FIELDNAMES.index("Severity")
+
     for row in ws.iter_rows(min_row=2):
-        level = row[0].value
-        fill = CHECK_LEVEL_FILLS.get(level)
+        severity = row[severity_index].value
+        fill = CHECK_SEVERITY_FILLS.get(severity)
 
         if fill is None:
             continue
@@ -122,7 +124,7 @@ def write_summary_sheet(
     ladder_source_count,
     comment_count,
 ):
-    check_level_counts = count_check_levels(check_rows)
+    check_severity_counts = count_check_severities(check_rows)
 
     ws.append(["Item", "Value"])
     ws.append(["Project name", metadata["ProjectName"]])
@@ -138,9 +140,9 @@ def write_summary_sheet(
     ws.append(["Total devices", len(input_rows) + len(output_rows)])
     ws.append(["Device usage rows", len(device_usage_rows)])
     ws.append(["Check items", len(check_rows)])
-    ws.append(["Check ERROR", check_level_counts["ERROR"]])
-    ws.append(["Check WARN", check_level_counts["WARN"]])
-    ws.append(["Check INFO", check_level_counts["INFO"]])
+    ws.append(["Check ERROR", check_severity_counts["ERROR"]])
+    ws.append(["Check WARN", check_severity_counts["WARN"]])
+    ws.append(["Check INFO", check_severity_counts["INFO"]])
 
     header_fill = PatternFill("solid", fgColor="D9EAF7")
     header_font = Font(bold=True)
@@ -182,10 +184,10 @@ def write_io_list_excel(
     )
 
     input_ws = wb.create_sheet("INPUT")
-    write_sheet(input_ws, input_rows, IO_FIELDNAMES)
+    write_sheet(input_ws, input_rows, IO_SHEET_FIELDNAMES)
 
     output_ws = wb.create_sheet("OUTPUT")
-    write_sheet(output_ws, output_rows, IO_FIELDNAMES)
+    write_sheet(output_ws, output_rows, IO_SHEET_FIELDNAMES)
 
     check_ws = wb.create_sheet("CHECK")
     write_check_sheet(check_ws, check_rows)

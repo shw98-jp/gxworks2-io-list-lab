@@ -1,22 +1,22 @@
-﻿No,Type,Device,DeviceComment,AddressNo,UsedFiles,Instructions,LogicNotes,Steps
-1,INPUT,X50,CH1 count start signal,80,01CmnPgm.csv,LD,Count enable command:ON,01CmnPgm.csv:129
-2,INPUT,X51,CH1 count stop signal,81,01CmnPgm.csv,LD,Count enable command:OFF,01CmnPgm.csv:145
-3,INPUT,X52,CH1 current value read signal,82,01CmnPgm.csv,LD,Stores current value in D2000,01CmnPgm.csv:161
-4,INPUT,X53,CH1 preset command signal,83,02PreSet.csv,LD,Preset command,02PreSet.csv:52
-5,INPUT,X54,CH1 counter fnc exe start signal,84,06DisCnt.csv,LD,Selected cnt fnc start cmd:ON,06DisCnt.csv:55
-6,INPUT,X55,CH1 counter fnc exe stop signal,85,06DisCnt.csv,LD,Selected cnt fnc start cmd:OFF,06DisCnt.csv:74
-7,INPUT,X56,CH1 latch 1 execution cmd signal,86,04Lcnt1.csv,LD,Selected counter fnc start cmd,04Lcnt1.csv:52
-8,INPUT,X57,CH1 latch cnt data 1 read signal,87,"04Lcnt1.csv,08LcPre.csv",LD,"Stores latch cnt val 1 in D2002,Stores latch cnt value in D2002","04Lcnt1.csv:71,08LcPre.csv:61"
-9,INPUT,X58,CH1 latch cnt data 2 read signal,88,05Lcnt2.csv,LD,Stores latch cnt val 2 in D2004,05Lcnt2.csv:52
-10,INPUT,X59,CH1 sampling count start signal,89,07SplCnt.csv,LD,Selected counter fnc start cmd,07SplCnt.csv:57
-11,INPUT,X5A,CH1 sampling cnt data read signl,90,07SplCnt.csv,LD,Stores sampling cnt val in D2006,07SplCnt.csv:76
-12,INPUT,X5B,CH1 coinc output enable signal,91,03MchOut.csv,LD,Coincidence output enable cmd,03MchOut.csv:58
-13,INPUT,X5C,CH1 coincidence LED clear signal,92,03MchOut.csv,AND,"Coinc sgnl 1 reset cmd:OFF,Coinc sgnl 1 reset cmd:ON",03MchOut.csv:98
-14,INPUT,X5D,CH1 freq measurement cmd signal,93,10ChkFrq.csv,LD,Stores measured freq in D2008,10ChkFrq.csv:57
-15,INPUT,X5E,CH1 rot speed measure cmd signal,94,11ChkRsp.csv,LD,Stores measured rot spd in D2010,11ChkRsp.csv:58
-16,INPUT,X5F,CH1 pulse measurement cmd signal,95,12ChkPls.csv,LD,Pulse measurement start command,12ChkPls.csv:55
-17,INPUT,X60,CH1 measured pulse read signal,96,12ChkPls.csv,LD,Stores measured pulse in D2012,12ChkPls.csv:75
-18,INPUT,X61,CH1 PWM output command signal,97,13OutPwm.csv,LD,,13OutPwm.csv:86
-19,INPUT,X62,CH1 error reset command signal,98,14RstErr.csv,LD,CH1 error reset command,14RstErr.csv:103
-1,OUTPUT,Y70,CH1 coinc confirmation LED sig,112,03MchOut.csv,OUT,Coincidence conf LED signal,03MchOut.csv:80
-2,OUTPUT,Y71,CH1 ovrflw occurrence LED signal,113,09ChkOvr.csv,OUT,Overflow confirmation LED signal,09ChkOvr.csv:59
+﻿No,Direction,Device,DeviceComment,UsedFiles,Steps,Instructions,LogicNotes
+1,INPUT,X50,CH1 count start signal,01CmnPgm.csv,01CmnPgm.csv:129,LD,Count enable command:ON
+2,INPUT,X51,CH1 count stop signal,01CmnPgm.csv,01CmnPgm.csv:145,LD,Count enable command:OFF
+3,INPUT,X52,CH1 current value read signal,01CmnPgm.csv,01CmnPgm.csv:161,LD,Stores current value in D2000
+4,INPUT,X53,CH1 preset command signal,02PreSet.csv,02PreSet.csv:52,LD,Preset command
+5,INPUT,X54,CH1 counter fnc exe start signal,06DisCnt.csv,06DisCnt.csv:55,LD,Selected cnt fnc start cmd:ON
+6,INPUT,X55,CH1 counter fnc exe stop signal,06DisCnt.csv,06DisCnt.csv:74,LD,Selected cnt fnc start cmd:OFF
+7,INPUT,X56,CH1 latch 1 execution cmd signal,04Lcnt1.csv,04Lcnt1.csv:52,LD,Selected counter fnc start cmd
+8,INPUT,X57,CH1 latch cnt data 1 read signal,"04Lcnt1.csv,08LcPre.csv","04Lcnt1.csv:71,08LcPre.csv:61",LD,"Stores latch cnt val 1 in D2002,Stores latch cnt value in D2002"
+9,INPUT,X58,CH1 latch cnt data 2 read signal,05Lcnt2.csv,05Lcnt2.csv:52,LD,Stores latch cnt val 2 in D2004
+10,INPUT,X59,CH1 sampling count start signal,07SplCnt.csv,07SplCnt.csv:57,LD,Selected counter fnc start cmd
+11,INPUT,X5A,CH1 sampling cnt data read signl,07SplCnt.csv,07SplCnt.csv:76,LD,Stores sampling cnt val in D2006
+12,INPUT,X5B,CH1 coinc output enable signal,03MchOut.csv,03MchOut.csv:58,LD,Coincidence output enable cmd
+13,INPUT,X5C,CH1 coincidence LED clear signal,03MchOut.csv,03MchOut.csv:98,AND,"Coinc sgnl 1 reset cmd:OFF,Coinc sgnl 1 reset cmd:ON"
+14,INPUT,X5D,CH1 freq measurement cmd signal,10ChkFrq.csv,10ChkFrq.csv:57,LD,Stores measured freq in D2008
+15,INPUT,X5E,CH1 rot speed measure cmd signal,11ChkRsp.csv,11ChkRsp.csv:58,LD,Stores measured rot spd in D2010
+16,INPUT,X5F,CH1 pulse measurement cmd signal,12ChkPls.csv,12ChkPls.csv:55,LD,Pulse measurement start command
+17,INPUT,X60,CH1 measured pulse read signal,12ChkPls.csv,12ChkPls.csv:75,LD,Stores measured pulse in D2012
+18,INPUT,X61,CH1 PWM output command signal,13OutPwm.csv,13OutPwm.csv:86,LD,
+19,INPUT,X62,CH1 error reset command signal,14RstErr.csv,14RstErr.csv:103,LD,CH1 error reset command
+1,OUTPUT,Y70,CH1 coinc confirmation LED sig,03MchOut.csv,03MchOut.csv:80,OUT,Coincidence conf LED signal
+2,OUTPUT,Y71,CH1 ovrflw occurrence LED signal,09ChkOvr.csv,09ChkOvr.csv:59,OUT,Overflow confirmation LED signal

@@ -18,16 +18,16 @@ def is_spare_or_unused_comment(comment):
     )
 
 
-def make_check_row(level, priority, category, check_type, device, message, details):
+def make_check_row(severity, priority, category, check_type, device, message, evidence):
     return {
-        "Level": level,
         "Priority": priority,
+        "Severity": severity,
         "ReviewStatus": "OPEN",
         "Category": category,
-        "Type": check_type,
+        "CheckType": check_type,
         "Device": device,
         "Message": message,
-        "Details": details,
+        "Evidence": evidence,
         "ReviewerNote": "",
     }
 
@@ -37,19 +37,17 @@ def build_output_rows(io_type, devices, device_comments):
 
     for index, device in enumerate(sorted(devices, key=device_sort_key), start=1):
         item = devices[device]
-        address_number = device_sort_key(device)[1]
 
         rows.append(
             {
                 "No": index,
-                "Type": io_type,
+                "Direction": io_type,
                 "Device": item["device"],
                 "DeviceComment": device_comments.get(device, ""),
-                "AddressNo": address_number,
                 "UsedFiles": ",".join(sorted(item["files"])),
+                "Steps": ",".join(sorted(item["steps"])),
                 "Instructions": ",".join(sorted(item["instructions"])),
                 "LogicNotes": ",".join(sorted(item["logic_notes"])),
-                "Steps": ",".join(sorted(item["steps"])),
             }
         )
 
@@ -84,14 +82,14 @@ def build_device_usage_rows(device_usage, device_comments):
         rows.append(
             {
                 "No": len(rows) + 1,
-                "UsageCategory": get_device_usage_category(item["device_type"]),
+                "DeviceCategory": get_device_usage_category(item["device_type"]),
                 "DeviceType": item["device_type"],
                 "Device": item["device"],
                 "DeviceComment": device_comments.get(item["device"], ""),
                 "Occurrences": item["occurrences"],
                 "UsedFiles": ",".join(sorted(item["files"])),
                 "Instructions": ",".join(sorted(item["instructions"])),
-                "Locations": ",".join(sorted(item["locations"])),
+                "UsageLocations": ",".join(sorted(item["locations"])),
             }
         )
 
